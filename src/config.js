@@ -29,27 +29,7 @@ export const siteConfig = {
   email: 'aswapathyraj@gmail.com',
   github: 'https://github.com/aswapathyraj',
   linkedin: '',
-
-  /**
-   * Contact form delivery.
-   *
-   *   provider: 'web3forms' → POST to Web3Forms with `web3formsAccessKey`
-   *   provider: 'endpoint'  → POST JSON to `endpoint`
-   *   provider: 'mailto'    → open the visitor's mail client, prefilled
-   *   provider: 'none'      → validate only, then show the mailto fallback
-   *
-   * The Web3Forms access key is public by design — it ships in the browser
-   * bundle and only authorises submissions to your own inbox. If the key is
-   * missing, the form falls back to the mailto path rather than faking a send.
-   */
-  contactForm: {
-    provider: 'web3forms',
-    web3formsAccessKey: 'bce7bec7-5443-4817-a224-5f70d298879c',
-    /** Sender label shown in the notification email. */
-    fromName: 'Portfolio Contact Form',
-    /** Only used when `provider` is 'endpoint'. */
-    endpoint: '',
-  },
+  
 
   /**
    * Path or URL to your CV. A file at `public/resume.pdf` is served from
@@ -92,6 +72,20 @@ export const siteConfig = {
     /** Fetches public GitHub data when `githubUsername` is set. */
     githubActivity: true,
     scrollProgressBar: true,
+  },
+
+  /**
+   * Contact form delivery. No provider is wired up by default, so the form
+   * validates and then tells the visitor to email directly instead of
+   * pretending a message was sent.
+   *
+   *   provider: 'none'     → validate, then show the mailto fallback
+   *   provider: 'endpoint' → POST JSON to `endpoint`
+   *   provider: 'mailto'   → open the visitor's mail client, prefilled
+   */
+  contactForm: {
+    provider: 'none',
+    endpoint: '',
   },
 }
 

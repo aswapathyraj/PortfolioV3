@@ -1,0 +1,301 @@
+@import 'tailwindcss';
+
+/* ---------------------------------------------------------------------------
+   Design tokens
+   ---------------------------------------------------------------------------
+   Every colour in the UI resolves to one of the `--p-*` palette variables
+   below. Because @theme is declared `inline`, Tailwind utilities compile to
+   `var(--p-…)` rather than a baked hex value — so switching `data-theme` on
+   <html> re-themes the entire site without a single `dark:` class.
+--------------------------------------------------------------------------- */
+
+@theme inline {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: 'Space Grotesk', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --color-void: var(--p-void);
+  --color-surface: var(--p-surface);
+  --color-elevated: var(--p-elevated);
+  --color-sunken: var(--p-sunken);
+  --color-line: var(--p-line);
+  --color-line-strong: var(--p-line-strong);
+
+  --color-fg: var(--p-fg);
+  --color-muted: var(--p-muted);
+  --color-subtle: var(--p-subtle);
+
+  --color-accent: var(--p-accent);
+  --color-accent-hover: var(--p-accent-hover);
+  --color-accent-soft: var(--p-accent-soft);
+  --color-accent-line: var(--p-accent-line);
+  --color-on-accent: var(--p-on-accent);
+
+  --color-accent2: var(--p-accent2);
+  --color-accent2-soft: var(--p-accent2-soft);
+
+  --color-success: var(--p-success);
+  --color-warn: var(--p-warn);
+  --color-danger: var(--p-danger);
+  --color-danger-soft: var(--p-danger-soft);
+
+  --radius-panel: 0.875rem;
+  --radius-inset: 0.5rem;
+
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+
+  --shadow-panel: 0 1px 2px var(--p-shadow-1), 0 12px 32px -18px var(--p-shadow-2);
+  --shadow-lift: 0 1px 2px var(--p-shadow-1), 0 28px 60px -28px var(--p-shadow-2);
+  --shadow-glow: 0 0 0 1px var(--p-accent-line), 0 12px 40px -16px var(--p-accent-glow);
+}
+
+/* Dark is the default and the design's home state. */
+:root {
+  --p-void: #08090a;
+  --p-surface: #0e1012;
+  --p-elevated: #14171a;
+  --p-sunken: #050607;
+  --p-line: #1c2126;
+  --p-line-strong: #2b3238;
+
+  --p-fg: #e9ecef;
+  --p-muted: #9aa1a9;
+  --p-subtle: #6b737b;
+
+  --p-accent: #00e5a0;
+  --p-accent-hover: #34f0b4;
+  --p-accent-soft: color-mix(in oklab, #00e5a0 12%, transparent);
+  --p-accent-line: color-mix(in oklab, #00e5a0 34%, transparent);
+  --p-accent-glow: color-mix(in oklab, #00e5a0 30%, transparent);
+  --p-on-accent: #04120c;
+
+  --p-accent2: #8c9dff;
+  --p-accent2-soft: color-mix(in oklab, #8c9dff 14%, transparent);
+
+  --p-success: #3ddc97;
+  --p-warn: #f4b860;
+  --p-danger: #ff6b6b;
+  --p-danger-soft: color-mix(in oklab, #ff6b6b 14%, transparent);
+
+  --p-shadow-1: rgb(0 0 0 / 0.5);
+  --p-shadow-2: rgb(0 0 0 / 0.7);
+  --p-grid: color-mix(in oklab, #ffffff 4.5%, transparent);
+  --p-grid-strong: color-mix(in oklab, #ffffff 8%, transparent);
+  --p-scrim: rgb(4 5 6 / 0.78);
+
+  color-scheme: dark;
+}
+
+[data-theme='light'] {
+  --p-void: #fbfbfc;
+  --p-surface: #ffffff;
+  --p-elevated: #f5f6f8;
+  --p-sunken: #f0f1f4;
+  --p-line: #e3e5ea;
+  --p-line-strong: #cbd0d8;
+
+  --p-fg: #14171a;
+  --p-muted: #565e68;
+  --p-subtle: #7a828c;
+
+  --p-accent: #00875a;
+  --p-accent-hover: #016c48;
+  --p-accent-soft: color-mix(in oklab, #00875a 10%, transparent);
+  --p-accent-line: color-mix(in oklab, #00875a 30%, transparent);
+  --p-accent-glow: color-mix(in oklab, #00875a 22%, transparent);
+  --p-on-accent: #ffffff;
+
+  --p-accent2: #4c5bd4;
+  --p-accent2-soft: color-mix(in oklab, #4c5bd4 10%, transparent);
+
+  --p-success: #157f52;
+  --p-warn: #9a6100;
+  --p-danger: #c4342f;
+  --p-danger-soft: color-mix(in oklab, #c4342f 10%, transparent);
+
+  --p-shadow-1: rgb(16 24 40 / 0.05);
+  --p-shadow-2: rgb(16 24 40 / 0.14);
+  --p-grid: color-mix(in oklab, #0b1220 5%, transparent);
+  --p-grid-strong: color-mix(in oklab, #0b1220 9%, transparent);
+  --p-scrim: rgb(251 251 252 / 0.82);
+
+  color-scheme: light;
+}
+
+/* Escape hatch for the handful of places a theme needs a different treatment
+   rather than a different colour (e.g. inverted code chrome). */
+@custom-variant light ([data-theme='light'] &);
+
+/* ---------------------------------------------------------------------------
+   Base layer
+--------------------------------------------------------------------------- */
+
+@layer base {
+  * {
+    border-color: var(--p-line);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* Keeps anchored sections clear of the fixed navbar. */
+    scroll-padding-top: 6rem;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: var(--p-void);
+    color: var(--p-fg);
+    font-family: var(--font-sans);
+    font-feature-settings: 'cv11', 'ss01';
+    font-variant-ligatures: contextual;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.022em;
+    text-wrap: balance;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--p-accent);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+
+  /* The custom cursor replaces the pointer only where it is actually enabled. */
+  [data-cursor='active'],
+  [data-cursor='active'] a,
+  [data-cursor='active'] button {
+    cursor: none;
+  }
+
+  ::selection {
+    background: var(--p-accent);
+    color: var(--p-on-accent);
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--p-sunken);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--p-line-strong);
+    border: 2px solid var(--p-sunken);
+    border-radius: 99px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--p-subtle);
+  }
+
+  /* Reduced motion: kill decorative CSS animation. Framer Motion is handled in
+     JS through <MotionConfig reducedMotion="user">. */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Composable utilities
+--------------------------------------------------------------------------- */
+
+/* Blueprint grid used behind the hero and section dividers. */
+@utility grid-field {
+  background-image:
+    linear-gradient(to right, var(--p-grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--p-grid) 1px, transparent 1px);
+  background-size: 56px 56px;
+  background-position: center center;
+}
+
+@utility grid-field-sm {
+  background-image:
+    linear-gradient(to right, var(--p-grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--p-grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+@utility dot-field {
+  background-image: radial-gradient(var(--p-grid-strong) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
+/* Small uppercase monospace label used for every technical caption. */
+@utility mono-label {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--p-subtle);
+}
+
+/* Fades the bottom/edges of decorative layers instead of hard-cutting them. */
+@utility mask-fade-b {
+  mask-image: linear-gradient(to bottom, black 0%, black 55%, transparent 100%);
+}
+
+@utility mask-fade-r {
+  mask-image: linear-gradient(to right, black 0%, black 70%, transparent 100%);
+}
+
+@utility mask-radial-center {
+  mask-image: radial-gradient(ellipse 62% 62% at 50% 40%, black 20%, transparent 78%);
+}
+
+/* One hairline that reads correctly on both themes. */
+@utility panel {
+  background-color: var(--p-surface);
+  border: 1px solid var(--p-line);
+  border-radius: var(--radius-panel);
+}
+
+@utility panel-inset {
+  background-color: var(--p-sunken);
+  border: 1px solid var(--p-line);
+  border-radius: var(--radius-inset);
+}
+
+/* Numeric columns stay aligned while animating. */
+@utility tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/**
+ * Truncation that is safe inside a flex or grid item.
+ *
+ * Plain `truncate` on a flex child is a trap: the item's default
+ * `min-width: auto` means its un-wrapped text still sets a minimum size, so the
+ * ellipsis never engages and the container is pushed wider than the viewport
+ * instead. Pairing the two here means using it cannot reintroduce that bug.
+ */
+@utility truncate-safe {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@utility scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--p-line-strong) transparent;
+}

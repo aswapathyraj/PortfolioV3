@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#08090A" />
+
+    <!--
+      Static copies of the primary tags so crawlers that do not execute JS still
+      get them. The live values are driven from src/config.js via <Seo /> — keep
+      the two in sync if you change your name or headline.
+    -->
+    <title>Aswapathy Raj — Full-Stack Developer</title>
+    <meta
+      name="description"
+      content="Portfolio of Aswapathy Raj, a full-stack developer building modern web applications with React, Node.js, APIs, and databases."
+    />
+    <meta name="author" content="Aswapathy Raj" />
+    <!--
+      No static canonical tag: with no siteUrl configured it could only point at
+      "/", which the build treats as an asset path. <Seo /> emits the canonical
+      link at runtime from src/config.js instead.
+    -->
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Aswapathy Raj" />
+    <meta property="og:title" content="Aswapathy Raj — Full-Stack Developer" />
+    <meta
+      property="og:description"
+      content="Portfolio of Aswapathy Raj, a full-stack developer building modern web applications with React, Node.js, APIs, and databases."
+    />
+    <meta property="og:image" content="/og-image.svg" />
+    <meta property="og:image:alt" content="Aswapathy Raj — Full-Stack Developer" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Aswapathy Raj — Full-Stack Developer" />
+    <meta
+      name="twitter:description"
+      content="Portfolio of Aswapathy Raj, a full-stack developer building modern web applications with React, Node.js, APIs, and databases."
+    />
+    <meta name="twitter:image" content="/og-image.svg" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Aswapathy Raj",
+        "jobTitle": "Full-Stack Developer",
+        "description": "Full-stack developer building modern web applications with React, Node.js, REST APIs, and SQL databases.",
+        "knowsAbout": [
+          "React",
+          "JavaScript",
+          "Node.js",
+          "Express.js",
+          "REST API design",
+          "SQLite",
+          "SQL",
+          "Tailwind CSS",
+          "JWT authentication",
+          "Web application security"
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>
+      This portfolio uses React for its interactive sections. Please enable
+      JavaScript, or reach out directly by email.
+    </noscript>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

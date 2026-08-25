@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Update the host once the site is deployed to its final domain.
+Sitemap: /sitemap.xml

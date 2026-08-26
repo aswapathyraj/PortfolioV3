@@ -318,12 +318,6 @@ export function ContactForm() {
         >
           {state === 'submitting' ? 'Sending…' : 'Send message'}
         </Button>
-
-        {!deliveryReady ? (
-          <span className="mono-label" title="Configure contactForm.provider in src/config.js">
-            validation only · no provider connected
-          </span>
-        ) : null}
       </div>
 
       {/* Result */}

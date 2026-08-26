@@ -43,7 +43,7 @@ export const siteConfig = {
 
   // ---- Deployment --------------------------------------------------------
   /** Canonical origin, no trailing slash. Used for SEO tags + sitemap. */
-  siteUrl: '',
+  siteUrl: 'https://portfolio-mauve-chi-wy3914jh09.vercel.app',
 
   // ---- SEO ---------------------------------------------------------------
   seo: {

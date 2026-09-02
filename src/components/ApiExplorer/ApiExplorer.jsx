@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { apiEndpoints, apiMeta, methodTones } from '../../data/api.js'
+import { getApiEndpoints, getApiMeta, getMethodTones } from '../../lib/publicData.js'
+import { usePublicData } from '../../lib/usePublicData.js'
 import { Section, SectionHeader } from '../ui/Section.jsx'
 import { Tag } from '../ui/Tag.jsx'
 import { Icon } from '../ui/Icon.jsx'
@@ -15,6 +16,10 @@ import { useRovingIndex } from '../../hooks/useRovingIndex.js'
  * convincing than one that fakes a deployed backend.
  */
 export function ApiExplorer() {
+  usePublicData()
+  const apiEndpoints = getApiEndpoints()
+  const apiMeta = getApiMeta()
+  const methodTones = getMethodTones()
   const [selected, setSelected] = useState(0)
   const endpoint = apiEndpoints[selected]
 

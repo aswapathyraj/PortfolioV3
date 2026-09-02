@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
-import { engineeringSteps } from '../../data/engineering.js'
-import { getProjectBySlug } from '../../data/projects.js'
+import { getEngineeringSteps, getProjectBySlug } from '../../lib/publicData.js'
+import { usePublicData } from '../../lib/usePublicData.js'
 import { Section, SectionHeader } from '../ui/Section.jsx'
 import { Icon } from '../ui/Icon.jsx'
 import { Tag } from '../ui/Tag.jsx'
@@ -17,6 +17,8 @@ import { swap } from '../../animations/variants.js'
  * are checkable against a case study rather than being generic process copy.
  */
 export function Engineering() {
+  usePublicData()
+  const engineeringSteps = getEngineeringSteps()
   const [selected, setSelected] = useState(0)
   const step = engineeringSteps[selected]
   const exampleProject = step.example ? getProjectBySlug(step.example.project) : null

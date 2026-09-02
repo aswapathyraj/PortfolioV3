@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { siteConfig, isConfigured } from '../../config.js'
+import { useSite } from '../../lib/usePublicData.js'
 import { validateContact, validateField, contactRules, contactFieldOrder } from '../../utils/validate.js'
 import { Button } from '../ui/Button.jsx'
 import { Icon } from '../ui/Icon.jsx'
@@ -18,8 +19,6 @@ import { swap } from '../../animations/variants.js'
  * prefilled mailto instead of showing a false "message sent".
  */
 
-const WEB3FORMS_ENDPOINT = 'https://api.web3forms.com/submit'
-
 const FIELDS = [
   { name: 'name', label: 'Name', type: 'text', placeholder: 'Your name', autoComplete: 'name' },
   { name: 'email', label: 'Email', type: 'email', placeholder: 'you@example.com', autoComplete: 'email' },
@@ -29,6 +28,7 @@ const FIELDS = [
 const EMPTY = { name: '', email: '', subject: '', message: '' }
 
 export function ContactForm() {
+  const { site } = useSite()
   const [values, setValues] = useState(EMPTY)
   const [errors, setErrors] = useState({})
   const [touched, setTouched] = useState({})
@@ -37,7 +37,13 @@ export function ContactForm() {
 
   const fieldRefs = useRef({})
   const botcheckRef = useRef(null)
-  const { provider, endpoint, web3formsAccessKey, fromName } = siteConfig.contactForm
+
+  // Delivery config comes from the CMS contact settings when hydrated (the
+  // frontend "contactForm" key mirrors the backend "contact" shape), falling
+  // back to the static config until then.
+  const cf = site.contact ?? siteConfig.contactForm
+  const { provider, endpoint, web3formsAccessKey } = cf
+  const email = site.email ?? siteConfig.email
 
   /**
    * True when the selected provider has everything it needs to actually
@@ -46,7 +52,7 @@ export function ContactForm() {
   const deliveryReady =
     (provider === 'web3forms' && isConfigured(web3formsAccessKey)) ||
     (provider === 'endpoint' && isConfigured(endpoint)) ||
-    (provider === 'mailto' && isConfigured(siteConfig.email))
+    (provider === 'mailto' && isConfigured(email))
 
   const setValue = (name, value) => {
     setValues((current) => ({ ...current, [name]: value }))
@@ -64,12 +70,12 @@ export function ContactForm() {
   }
 
   const mailtoHref = () => {
-    if (!isConfigured(siteConfig.email)) return ''
+    if (!isConfigured(email)) return ''
     const subject = encodeURIComponent(values.subject || 'Portfolio enquiry')
     const body = encodeURIComponent(
       `${values.message}\n\n—\n${values.name}${values.email ? ` · ${values.email}` : ''}`,
     )
-    return `mailto:${siteConfig.email}?subject=${subject}&body=${body}`
+    return `mailto:${email}?subject=${subject}&body=${body}`
   }
 
   const handleSubmit = async (event) => {
@@ -114,20 +120,17 @@ export function ContactForm() {
     // ---- Real POST ----
     setState('submitting')
 
+    // web3forms and endpoint both deliver through the backend: it stores every
+    // submission in the portfolio inbox and forwards to the configured provider,
+    // so nothing is lost and the admin inbox stays populated too.
     const isWeb3Forms = provider === 'web3forms'
-    const url = isWeb3Forms ? WEB3FORMS_ENDPOINT : endpoint
-    const payload = isWeb3Forms
-      ? {
-          access_key: web3formsAccessKey,
-          from_name: isConfigured(fromName) ? fromName : `${siteConfig.name} portfolio`,
-          subject: values.subject,
-          name: values.name,
-          email: values.email,
-          message: values.message,
-          // Honeypot: bots that fill every field tick this and get rejected.
-          botcheck: botcheckRef.current?.checked ? true : '',
-        }
-      : values
+    const url = isWeb3Forms || provider === 'endpoint' ? '/api/public/contact' : endpoint
+    const payload = {
+      name: values.name,
+      email: values.email,
+      subject: values.subject,
+      message: values.message,
+    }
 
     try {
       const response = await fetch(url, {
@@ -136,24 +139,26 @@ export function ContactForm() {
         body: JSON.stringify(payload),
       })
 
-      // Web3Forms answers 200 with `success: false` for spam and quota
-      // rejections, so the body decides — not the status code alone.
-      const result = isWeb3Forms ? await response.json().catch(() => null) : null
+      // The backend answers { success, data: { id, delivered, deliveryNote } }.
+      const result = await response.json().catch(() => null)
 
-      if (!response.ok || (isWeb3Forms && !result?.success)) {
+      if (!response.ok) {
         setState('error')
         setStatusMessage(
-          response.status === 429
-            ? 'Too many messages sent from this address. Please try again shortly.'
-            : result?.message
-              ? `${result.message} Email works as a fallback.`
-              : `The form service responded with ${response.status}. Email works as a fallback.`,
+          response.status === 422
+            ? 'Please check the details and try again.'
+            : `The form service responded with ${response.status}. Email works as a fallback.`,
         )
         return
       }
 
+      const delivered = result?.data?.delivered
       setState('success')
-      setStatusMessage('Message sent. I will get back to you.')
+      setStatusMessage(
+        typeof delivered === 'boolean' && delivered === false
+          ? 'Message received and stored. I will get back to you.'
+          : 'Message sent. I will get back to you.',
+      )
       setValues(EMPTY)
       setTouched({})
       setErrors({})
@@ -351,7 +356,7 @@ export function ContactForm() {
               <span>{statusMessage}</span>
             </p>
 
-            {state !== 'success' && isConfigured(siteConfig.email) ? (
+            {state !== 'success' && isConfigured(email) ? (
               <div className="mt-3.5 flex flex-wrap gap-2">
                 <Button href={mailtoHref()} size="sm" variant="secondary" icon="mail">
                   Send it by email instead

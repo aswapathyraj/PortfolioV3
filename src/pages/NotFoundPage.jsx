@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
-import { realProjects } from '../data/projects.js'
+import { getRealProjects } from '../lib/publicData.js'
+import { usePublicData } from '../lib/usePublicData.js'
 import { Container } from '../components/ui/Section.jsx'
 import { Seo } from '../components/ui/Seo.jsx'
 import { Button } from '../components/ui/Button.jsx'
@@ -14,6 +15,8 @@ import { Reveal } from '../components/ui/Reveal.jsx'
  */
 export function NotFoundPage({ reason = 'route', slug }) {
   const isProject = reason === 'project'
+  usePublicData()
+  const realProjects = getRealProjects()
 
   return (
     <>

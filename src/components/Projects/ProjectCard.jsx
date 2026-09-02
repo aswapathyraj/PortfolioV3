@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
-import { resolveSkillNames } from '../../data/skills.js'
+import { resolveSkillNames } from '../../lib/publicData.js'
 import { cn } from '../../utils/cn.js'
 import { Icon } from '../ui/Icon.jsx'
 import { Button } from '../ui/Button.jsx'

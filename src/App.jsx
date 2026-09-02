@@ -11,6 +11,8 @@ import { Icon } from './components/ui/Icon.jsx'
 import { HomePage } from './pages/HomePage.jsx'
 import { page } from './animations/variants.js'
 import { missingConfigKeys } from './config.js'
+import { hydratePublicData, getSite } from './lib/publicData.js'
+import { usePublicData } from './lib/usePublicData.js'
 
 /**
  * Case studies are route-split: the home page's first paint does not pay for a
@@ -21,6 +23,12 @@ const ProjectDetailPage = lazy(() =>
 )
 const NotFoundPage = lazy(() =>
   import('./pages/NotFoundPage.jsx').then((module) => ({ default: module.NotFoundPage })),
+)
+
+// The Control Center (admin) is a separate lazy bundle so the public site never
+// pays for its dependencies or its CSS-free layout shell.
+const AdminApp = lazy(() =>
+  import('./admin/AdminApp.jsx').then((module) => ({ default: module.default })),
 )
 
 /** Neutral hold while a split route arrives. Deliberately quiet. */
@@ -40,7 +48,7 @@ function useConfigChecklist() {
   useEffect(() => {
     if (!import.meta.env.DEV) return
 
-    const missing = missingConfigKeys()
+    const missing = missingConfigKeys(getSite())
     if (missing.length === 0) return
 
     console.info(
@@ -78,8 +86,41 @@ function AnimatedRoutes() {
   )
 }
 
+/** Loads CMS content from the live API once, falling back to static data. */
+function usePublicHydration() {
+  useEffect(() => {
+    // Fire once; hydration self-guards and never throws.
+    hydratePublicData()
+  }, [])
+}
+
 export default function App() {
   useConfigChecklist()
+  const { pathname } = useLocation()
+  const isAdmin = pathname === '/admin' || pathname.startsWith('/admin/')
+
+  // Only the public site loads live CMS content; the console keeps its own.
+  usePublicHydration()
+  usePublicData()
+
+  // Honor the admin appearance toggle: turning animations off forces reduced
+  // motion so Framer collapses every transition to opacity (the design system's
+  // documented reduced-motion path) instead of mounting heavy motion.
+  const animations = getSite().appearance?.animations ?? true
+
+  // The Control Center is intentionally chrome-free: no navbar, footer, cursor
+  // or page transition — the console has its own shell and navigation.
+  if (isAdmin) {
+    return (
+      <ThemeProvider>
+        <Suspense fallback={<RouteFallback />}>
+          <ErrorBoundary label="admin">
+            <AdminApp />
+          </ErrorBoundary>
+        </Suspense>
+      </ThemeProvider>
+    )
+  }
 
   return (
     <ThemeProvider>
@@ -89,7 +130,7 @@ export default function App() {
         animation are dropped, opacity is kept. It is why no variant in
         src/animations needs a second reduced-motion definition.
       */}
-      <MotionConfig reducedMotion="user">
+      <MotionConfig reducedMotion={animations ? 'user' : 'always'}>
         <ScrollProgress />
         <Cursor />
         <Navbar />

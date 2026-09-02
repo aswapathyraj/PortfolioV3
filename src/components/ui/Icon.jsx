@@ -74,9 +74,30 @@ import {
   Workflow,
   X,
   Zap,
+  // Admin / Control-Center icons
+  Activity,
+  Bell,
+  Command,
+  Edit3,
+  Filter,
+  Globe,
+  GripVertical,
+  Image,
+  KeySquare,
+  MessageSquare,
+  MoreHorizontal,
+  PanelLeft,
+  PieChart,
+  Plus,
+  Save,
+  Settings,
+  TrendingUp,
+  Trash2,
+  Unplug,
+  Upload,
 } from 'lucide-react'
 
-import { SiPython,SiFlask } from 'react-icons/si';
+import { SiPython, SiFlask, SiGithub } from 'react-icons/si';
 /**
  * Icon registry.
  *
@@ -174,6 +195,29 @@ const registry = {
   blocked: Ban,
   retry: RefreshCw,
   play: Play,
+
+  // Admin / Control-Center
+  activity: Activity,
+  bell: Bell,
+  command: Command,
+  edit: Edit3,
+  filter: Filter,
+  github: SiGithub,
+  globe: Globe,
+  drag: GripVertical,
+  image: Image,
+  keySquare: KeySquare,
+  message: MessageSquare,
+  more: MoreHorizontal,
+  panelLeft: PanelLeft,
+  chart: PieChart,
+  plus: Plus,
+  save: Save,
+  settings: Settings,
+  trends: TrendingUp,
+  trash: Trash2,
+  unplug: Unplug,
+  upload: Upload,
 }
 
 /**

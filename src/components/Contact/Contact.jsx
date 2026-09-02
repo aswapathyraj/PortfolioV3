@@ -1,4 +1,5 @@
 import { siteConfig, isConfigured } from '../../config.js'
+import { useSite } from '../../lib/usePublicData.js'
 import { Section, SectionHeader } from '../ui/Section.jsx'
 import { Reveal } from '../ui/Reveal.jsx'
 import { Icon } from '../ui/Icon.jsx'
@@ -10,10 +11,10 @@ import { ContactForm } from './ContactForm.jsx'
 import { useCopyToClipboard } from '../../hooks/useCopyToClipboard.js'
 
 /** Email row with a copy affordance — faster than selecting the text. */
-function EmailRow() {
+function EmailRow({ email }) {
   const { copy, copied } = useCopyToClipboard()
 
-  if (!isConfigured(siteConfig.email)) {
+  if (!isConfigured(email)) {
     return (
       <div className="rounded-panel border border-dashed border-line bg-sunken p-4">
         <p className="flex items-center gap-2 text-[0.875rem] text-muted">
@@ -30,17 +31,17 @@ function EmailRow() {
       <p className="mono-label mb-2.5">Direct</p>
       <div className="flex flex-wrap items-center gap-2">
         <a
-          href={`mailto:${siteConfig.email}`}
+          href={`mailto:${email}`}
           className="min-w-0 truncate-safe font-mono text-[0.875rem] text-fg transition-colors duration-200 hover:text-accent"
         >
-          {siteConfig.email}
+          {email}
         </a>
         <Button
           as="button"
           size="sm"
           variant="ghost"
           icon={copied ? 'check' : 'copy'}
-          onClick={() => copy(siteConfig.email)}
+          onClick={() => copy(email)}
           className={copied ? 'text-accent' : undefined}
         >
           {copied ? 'Copied' : 'Copy'}
@@ -51,7 +52,14 @@ function EmailRow() {
 }
 
 export function Contact() {
-  const { availability } = siteConfig
+  const { site } = useSite()
+  const availability = site.availability ?? siteConfig.availability
+  const email = site.email ?? siteConfig.email
+  const location = site.location ?? siteConfig.location
+  const timezone = site.timezone ?? siteConfig.timezone
+  const cf = site.contact ?? siteConfig.contactForm
+  const deliveryConfigured =
+    cf?.provider === 'web3forms' || (cf?.provider === 'endpoint' && isConfigured(cf?.endpoint) ) || cf?.provider === 'mailto'
 
   return (
     <Section id="contact" className="pb-24 sm:pb-28">
@@ -83,10 +91,10 @@ export function Contact() {
               </p>
             </div>
 
-            {(isConfigured(siteConfig.location) || isConfigured(siteConfig.timezone)) && (
+            {(isConfigured(location) || isConfigured(timezone)) && (
               <p className="mono-label mt-3 flex items-center gap-1.5">
                 <Icon name="location" className="size-3" />
-                {[siteConfig.location, siteConfig.timezone].filter(Boolean).join(' · ')}
+                {[location, timezone].filter(Boolean).join(' · ')}
               </p>
             )}
 
@@ -100,13 +108,13 @@ export function Contact() {
             </div>
           </div>
 
-          <EmailRow />
+          <EmailRow email={email} />
 
           <p className="flex items-start gap-2 rounded-inset border border-line bg-sunken px-3.5 py-3 text-[0.75rem] leading-relaxed text-subtle">
             <Icon name="info" className="mt-0.5 size-3.5 shrink-0" />
             The form validates your message client-side and server-side using the same module. Where
-            it goes next depends on which provider is configured — right now, nothing is sent
-            silently.
+            it goes next depends on which provider is configured
+            {deliveryConfigured ? ' — right now it sends through the configured service.' : ' — right now, nothing is sent silently.'}
           </p>
         </Reveal>
       </div>

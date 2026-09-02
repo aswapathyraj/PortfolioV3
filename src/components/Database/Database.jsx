@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { realProjects } from '../../data/projects.js'
+import { getRealProjects } from '../../lib/publicData.js'
+import { usePublicData } from '../../lib/usePublicData.js'
 import { Section, SectionHeader } from '../ui/Section.jsx'
 import { Icon } from '../ui/Icon.jsx'
 import { CodeBlock } from '../ui/CodeBlock.jsx'
@@ -16,8 +17,6 @@ import { swap } from '../../animations/variants.js'
  * illustrations — column types are simplified for readability, and no
  * credentials, connection strings, or real data appear anywhere.
  */
-
-const withSchema = realProjects.filter((project) => project.database?.tables?.length)
 
 /** Illustrative query per project — the kind of join the schema is built for. */
 const exampleQueries = {
@@ -50,6 +49,8 @@ ORDER BY day DESC;`,
 }
 
 export function Database() {
+  usePublicData()
+  const withSchema = getRealProjects().filter((project) => project.database?.tables?.length)
   const [projectIndex, setProjectIndex] = useState(0)
   const [selectedTable, setSelectedTable] = useState(null)
 

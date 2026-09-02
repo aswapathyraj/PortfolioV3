@@ -24,3 +24,10 @@ dist-ssr
 *.sw?
 
 .vercel
+
+# Portfolio Control Center — server
+server/.env
+server/uploads
+server/prisma/dev.db
+server/prisma/dev.db-journal
+server/*.db

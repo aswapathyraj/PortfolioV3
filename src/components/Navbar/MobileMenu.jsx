@@ -1,7 +1,8 @@
 import { useRef } from 'react'
 import { motion } from 'framer-motion'
 import { navLinks, engineeringSubLinks } from '../../data/navigation.js'
-import { siteConfig, isConfigured } from '../../config.js'
+import { isConfigured } from '../../config.js'
+import { useSite } from '../../lib/usePublicData.js'
 import { cn } from '../../utils/cn.js'
 import { useLockBodyScroll } from '../../hooks/useLockBodyScroll.js'
 import { useFocusTrap } from '../../hooks/useFocusTrap.js'
@@ -24,7 +25,8 @@ export function MobileMenu({ activeSection, onNavigate, onClose }) {
   useLockBodyScroll(true)
   useFocusTrap(panelRef, true, onClose)
 
-  const { availability } = siteConfig
+  const { site } = useSite()
+  const { availability } = site
   const socials = socialLinks().filter((item) => item.configured)
 
   return (
@@ -136,10 +138,10 @@ export function MobileMenu({ activeSection, onNavigate, onClose }) {
               ))}
             </div>
 
-            {isConfigured(siteConfig.location) ? (
+            {isConfigured(site.location) ? (
               <p className="mono-label mt-4 flex items-center gap-1.5">
                 <Icon name="location" className="size-3" />
-                {siteConfig.location}
+                {site.location}
               </p>
             ) : null}
           </motion.div>

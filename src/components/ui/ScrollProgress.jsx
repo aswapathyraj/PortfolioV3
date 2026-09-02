@@ -1,5 +1,5 @@
 import { motion, useReducedMotion, useScroll, useSpring } from 'framer-motion'
-import { siteConfig } from '../../config.js'
+import { useSite } from '../../lib/usePublicData.js'
 
 /**
  * Thin scroll progress bar pinned to the top of the viewport.
@@ -8,6 +8,7 @@ import { siteConfig } from '../../config.js'
  * bar never triggers a re-render while scrolling.
  */
 export function ScrollProgress() {
+  const { site } = useSite()
   const prefersReducedMotion = useReducedMotion()
   const { scrollYProgress } = useScroll()
 
@@ -17,7 +18,7 @@ export function ScrollProgress() {
     restDelta: 0.001,
   })
 
-  if (!siteConfig.features.scrollProgressBar) return null
+  if (!site.features.scrollProgressBar) return null
 
   return (
     <motion.div

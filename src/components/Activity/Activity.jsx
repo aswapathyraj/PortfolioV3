@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { useGithubData, GITHUB_STATUS } from '../../hooks/useGithubData.js'
-import { siteConfig } from '../../config.js'
+import { useSite } from '../../lib/usePublicData.js'
 import { Section, SectionHeader } from '../ui/Section.jsx'
 import { Icon } from '../ui/Icon.jsx'
 import { Button } from '../ui/Button.jsx'
@@ -57,6 +57,7 @@ function LoadingSkeleton() {
 }
 
 export function Activity() {
+  const { site } = useSite()
   const { status, data, message, retry, username } = useGithubData()
 
   const header = (
@@ -308,7 +309,7 @@ export function Activity() {
             contribution graphs are not exposed by the API without a token.
           </p>
 
-          {siteConfig.features.githubActivity ? (
+          {site.features.githubActivity ? (
             <Tag tone="ghost" className="self-start">
               live · fetched on load
             </Tag>

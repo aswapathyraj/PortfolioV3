@@ -1,5 +1,6 @@
 import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from 'framer-motion'
-import { siteConfig, isConfigured } from '../../config.js'
+import { isConfigured } from '../../config.js'
+import { useSite } from '../../lib/usePublicData.js'
 import { Container } from '../ui/Section.jsx'
 import { Button } from '../ui/Button.jsx'
 import { Icon } from '../ui/Icon.jsx'
@@ -17,6 +18,7 @@ import { useHasFinePointer } from '../../hooks/useMediaQuery.js'
  * deliberately quieter so this reads as the entry point.
  */
 export function Hero() {
+  const { site } = useSite()
   const prefersReducedMotion = useReducedMotion()
   const hasFinePointer = useHasFinePointer()
   const parallaxEnabled = hasFinePointer && !prefersReducedMotion
@@ -41,7 +43,7 @@ export function Hero() {
     pointerY.set(0)
   }
 
-  const { availability } = siteConfig
+  const { availability } = site
   const socials = socialLinks().filter((item) => item.configured)
 
   return (
@@ -86,14 +88,14 @@ export function Hero() {
               className="mt-7 text-[2.5rem] leading-[1.04] tracking-[-0.03em] sm:text-[3.5rem] lg:text-[4.25rem]"
             >
               <span className="block text-muted">Hi, I&rsquo;m</span>
-              <span className="mt-1 block text-fg">{siteConfig.name}.</span>
+              <span className="mt-1 block text-fg">{site.name}.</span>
             </motion.h1>
 
             <motion.p
               variants={fadeUp(16)}
               className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2 font-display text-xl text-accent sm:text-2xl"
             >
-              {siteConfig.title}
+              {site.title}
               <span aria-hidden="true" className="hidden h-px w-10 bg-accent/40 sm:inline-block" />
               <span className="mono-label hidden sm:inline">Frontend · API · Database</span>
             </motion.p>
@@ -102,7 +104,7 @@ export function Hero() {
               variants={fadeUp(16)}
               className="mt-6 max-w-xl text-pretty text-base leading-relaxed text-muted sm:text-[1.0625rem]"
             >
-              {siteConfig.headline}
+              {site.headline}
             </motion.p>
 
             <motion.div variants={fadeUp(16)} className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
@@ -153,10 +155,10 @@ export function Hero() {
                 label="Resume"
               />
 
-              {isConfigured(siteConfig.location) ? (
+              {isConfigured(site.location) ? (
                 <span className="inline-flex items-center gap-2 text-[0.8125rem] text-subtle">
                   <Icon name="location" className="size-4" />
-                  {siteConfig.location}
+                  {site.location}
                 </span>
               ) : null}
             </motion.div>

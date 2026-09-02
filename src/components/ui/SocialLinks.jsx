@@ -1,4 +1,5 @@
-import { siteConfig, isConfigured } from '../../config.js'
+import { isConfigured } from '../../config.js'
+import { getSite } from '../../lib/publicData.js'
 import { cn } from '../../utils/cn.js'
 import { Button, IconButton } from './Button.jsx'
 import { Icon } from './Icon.jsx'
@@ -8,37 +9,43 @@ import { GithubIcon, LinkedinIcon } from './BrandIcons.jsx'
  * The one place that decides how a configured-vs-unconfigured personal link
  * renders. Reused by the navbar, hero, contact panel, and footer, so an unset
  * value degrades identically everywhere instead of shipping a dead link.
+ *
+ * Reads through getSite() so a re-render from a subscribing ancestor picks up
+ * live profile links after hydration.
  */
 
 /** Declared at module scope so its identity is stable across renders. */
 const MailGlyph = ({ className }) => <Icon name="mail" className={className} />
 
-export const socialLinks = () => [
-  {
-    id: 'github',
-    label: 'GitHub',
-    href: siteConfig.github,
-    configured: isConfigured(siteConfig.github),
-    Component: GithubIcon,
-    configKey: 'github',
-  },
-  {
-    id: 'linkedin',
-    label: 'LinkedIn',
-    href: siteConfig.linkedin,
-    configured: isConfigured(siteConfig.linkedin),
-    Component: LinkedinIcon,
-    configKey: 'linkedin',
-  },
-  {
-    id: 'email',
-    label: 'Email',
-    href: isConfigured(siteConfig.email) ? `mailto:${siteConfig.email}` : '',
-    configured: isConfigured(siteConfig.email),
-    Component: MailGlyph,
-    configKey: 'email',
-  },
-]
+export const socialLinks = () => {
+  const site = getSite()
+  return [
+    {
+      id: 'github',
+      label: 'GitHub',
+      href: site.github,
+      configured: isConfigured(site.github),
+      Component: GithubIcon,
+      configKey: 'github',
+    },
+    {
+      id: 'linkedin',
+      label: 'LinkedIn',
+      href: site.linkedin,
+      configured: isConfigured(site.linkedin),
+      Component: LinkedinIcon,
+      configKey: 'linkedin',
+    },
+    {
+      id: 'email',
+      label: 'Email',
+      href: isConfigured(site.email) ? `mailto:${site.email}` : '',
+      configured: isConfigured(site.email),
+      Component: MailGlyph,
+      configKey: 'email',
+    },
+  ]
+}
 
 /** Row of icon-only social links. Unset entries are omitted, not disabled. */
 export function SocialIconRow({ items = socialLinks(), className, size = 'icon-sm' }) {
@@ -97,7 +104,8 @@ export function SocialTextLinks({ className }) {
  * than a button that 404s. `variant` and `size` pass through to Button.
  */
 export function ResumeButton({ variant = 'secondary', size = 'md', className, label = 'Resume', icon = 'resume' }) {
-  const configured = isConfigured(siteConfig.resume)
+  const resume = getSite().resume
+  const configured = isConfigured(resume)
 
   if (!configured) {
     return (
@@ -116,11 +124,11 @@ export function ResumeButton({ variant = 'secondary', size = 'md', className, la
     )
   }
 
-  const isExternal = /^https?:/i.test(siteConfig.resume)
+  const isExternal = /^https?:/i.test(resume)
 
   return (
     <Button
-      href={siteConfig.resume}
+      href={resume}
       external={isExternal}
       variant={variant}
       size={size}

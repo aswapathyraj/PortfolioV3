@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom'
-import { siteConfig, isConfigured } from '../../config.js'
+import { isConfigured } from '../../config.js'
 import { navLinks, engineeringSubLinks } from '../../data/navigation.js'
+import { useSite } from '../../lib/usePublicData.js'
 import { Container } from '../ui/Section.jsx'
 import { Icon } from '../ui/Icon.jsx'
 import { Logo } from '../Navbar/Logo.jsx'
@@ -12,6 +13,7 @@ export function Footer() {
   const navigate = useNavigate()
   const isHome = location.pathname === '/'
   const year = new Date().getFullYear()
+  const { site } = useSite()
 
   const go = (id) => {
     if (isHome && scrollToSection(id)) return
@@ -31,7 +33,7 @@ export function Footer() {
           <div className="min-w-0">
             <Logo />
             <p className="mt-5 max-w-sm text-pretty text-[0.875rem] leading-relaxed text-muted">
-              {siteConfig.headline}
+              {site.headline}
             </p>
             <div className="mt-5">
               <ResumeButton size="sm" variant="secondary" />
@@ -79,10 +81,10 @@ export function Footer() {
             <p className="mono-label mb-4">Elsewhere</p>
             <SocialTextLinks />
 
-            {isConfigured(siteConfig.location) ? (
+            {isConfigured(site.location) ? (
               <p className="mono-label mt-5 flex items-center gap-1.5">
                 <Icon name="location" className="size-3" />
-                {siteConfig.location}
+                {site.location}
               </p>
             ) : null}
           </div>
@@ -91,7 +93,7 @@ export function Footer() {
         {/* Baseline */}
         <div className="flex flex-col items-start justify-between gap-4 border-t border-line py-6 sm:flex-row sm:items-center">
           <p className="text-[0.78125rem] text-subtle">
-            © {year} {siteConfig.name}. {siteConfig.title}.
+            © {year} {site.name}. {site.title}.
           </p>
 
           <div className="flex items-center gap-5">

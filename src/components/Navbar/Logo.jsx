@@ -1,5 +1,5 @@
 import { cn } from '../../utils/cn.js'
-import { siteConfig } from '../../config.js'
+import { useSite } from '../../lib/usePublicData.js'
 
 /**
  * Monogram + wordmark.
@@ -8,6 +8,7 @@ import { siteConfig } from '../../config.js'
  * needs no asset request.
  */
 export function Logo({ compact = false, className }) {
+  const { site } = useSite()
   return (
     <span className={cn('flex items-center gap-2.5', className)}>
       <span
@@ -34,10 +35,10 @@ export function Logo({ compact = false, className }) {
       */}
       <span className={cn('flex flex-col leading-none', compact && 'sr-only sm:not-sr-only sm:flex')}>
         <span className="font-display text-[0.9375rem] font-semibold tracking-tight text-fg">
-          {siteConfig.name}
+          {site.name}
         </span>
         <span className="mt-1 font-mono text-[0.625rem] tracking-[0.12em] text-subtle">
-          {siteConfig.title.toUpperCase()}
+          {site.title.toUpperCase()}
         </span>
       </span>
     </span>

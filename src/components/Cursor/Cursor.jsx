@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { motion, useMotionValue, useReducedMotion, useSpring } from 'framer-motion'
-import { siteConfig } from '../../config.js'
 import { useHasFinePointer } from '../../hooks/useMediaQuery.js'
 import { spring } from '../../animations/transitions.js'
+import { useSite } from '../../lib/usePublicData.js'
 
 /**
  * Custom cursor.
@@ -13,9 +13,10 @@ import { spring } from '../../animations/transitions.js'
  * one is actually mounted, so it can never leave a visitor with no pointer.
  */
 export function Cursor() {
+  const { site } = useSite()
   const hasFinePointer = useHasFinePointer()
   const prefersReducedMotion = useReducedMotion()
-  const enabled = siteConfig.features.customCursor && hasFinePointer && !prefersReducedMotion
+  const enabled = site.features.customCursor && hasFinePointer && !prefersReducedMotion
 
   const x = useMotionValue(-100)
   const y = useMotionValue(-100)

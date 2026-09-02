@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { siteConfig, isConfigured } from '../config.js'
+import { isConfigured } from '../config.js'
+import { useSite } from '../lib/usePublicData.js'
 
 /**
  * Fetches public GitHub data for the configured username.
@@ -60,8 +61,9 @@ function extractCommits(events, limit = 6) {
 }
 
 export function useGithubData() {
-  const username = siteConfig.githubUsername
-  const enabled = siteConfig.features.githubActivity && isConfigured(username)
+  const { site } = useSite()
+  const username = site.githubUsername
+  const enabled = site.features.githubActivity && isConfigured(username)
 
   const [status, setStatus] = useState(enabled ? STATUS.LOADING : STATUS.UNCONFIGURED)
   const [data, setData] = useState(null)

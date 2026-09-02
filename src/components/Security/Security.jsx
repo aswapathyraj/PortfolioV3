@@ -1,8 +1,13 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
-import { securityControls, securityLevels, securityNote } from '../../data/security.js'
-import { getProjectBySlug } from '../../data/projects.js'
+import {
+  getSecurityControls,
+  getSecurityLevels,
+  getSecurityNote,
+  getProjectBySlug,
+} from '../../lib/publicData.js'
+import { usePublicData } from '../../lib/usePublicData.js'
 import { Section, SectionHeader } from '../ui/Section.jsx'
 import { Icon } from '../ui/Icon.jsx'
 import { cn } from '../../utils/cn.js'
@@ -17,8 +22,10 @@ import { viewport } from '../../animations/transitions.js'
  * implemented control links to the project it runs in.
  */
 
+const getSecurityLevelsRef = getSecurityLevels
+
 function ControlCard({ control, expanded, onToggle }) {
-  const level = securityLevels[control.level]
+  const level = getSecurityLevelsRef()[control.level]
   const isImplemented = control.level === 'implemented'
   const panelId = `security-panel-${control.id}`
 
@@ -140,6 +147,10 @@ function ControlCard({ control, expanded, onToggle }) {
 }
 
 export function Security() {
+  usePublicData()
+  const securityControls = getSecurityControls()
+  const securityLevels = getSecurityLevels()
+  const securityNote = getSecurityNote()
   const [expandedId, setExpandedId] = useState(securityControls[0].id)
 
   const implemented = securityControls.filter((control) => control.level === 'implemented')

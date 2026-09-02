@@ -1,6 +1,9 @@
 import { useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { methodTones, apiMeta } from '../../data/api.js'
+import { getMethodTones, getApiMeta } from '../../lib/publicData.js'
+
+const methodTones = getMethodTones()
+const apiMeta = getApiMeta()
 import { mockRequest, statusText, SIMULATED_LATENCY_MS } from '../../utils/mockApi.js'
 import { prettyJson } from '../../utils/format.js'
 import { Button } from '../ui/Button.jsx'

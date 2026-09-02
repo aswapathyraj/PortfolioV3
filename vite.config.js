@@ -4,6 +4,15 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  server: {
+    proxy: {
+      // Admin/Control-Center API lives in the separate `server/` package.
+      '/api': {
+        target: 'http://localhost:4000',
+        changeOrigin: true,
+      },
+    },
+  },
   build: {
     target: 'es2022',
     cssCodeSplit: true,

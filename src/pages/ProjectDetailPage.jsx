@@ -1,8 +1,13 @@
 import { useEffect, useMemo } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { realProjects, getProjectBySlug } from '../data/projects.js'
-import { resolveSkillNames, getSkillById } from '../data/skills.js'
+import {
+  getProjectBySlug,
+  getRealProjects,
+  resolveSkillNames,
+  getSkillById,
+} from '../lib/publicData.js'
+import { usePublicData } from '../lib/usePublicData.js'
 import { Container } from '../components/ui/Section.jsx'
 import { Seo } from '../components/ui/Seo.jsx'
 import { Button } from '../components/ui/Button.jsx'
@@ -40,6 +45,7 @@ function CaseSection({ id, index, title, description, children, className }) {
 
 export function ProjectDetailPage() {
   const { slug } = useParams()
+  usePublicData()
   const project = getProjectBySlug(slug)
 
   // Start each case study at the top rather than mid-page.
@@ -48,6 +54,7 @@ export function ProjectDetailPage() {
   }, [slug])
 
   const { previous, next } = useMemo(() => {
+    const realProjects = getRealProjects()
     const index = realProjects.findIndex((item) => item.slug === slug)
     if (index === -1) return { previous: null, next: null }
     return {
@@ -109,7 +116,9 @@ export function ProjectDetailPage() {
             <motion.div variants={fadeUp(12)} className="mt-7 flex flex-wrap items-center gap-2.5">
               <Tag tone="accent">{project.category}</Tag>
               {project.year ? <Tag tone="ghost">{project.year}</Tag> : null}
-              <Tag tone="ghost">{project.status === 'shipped' ? 'Shipped' : 'In progress'}</Tag>
+              <Tag tone="ghost">
+                {project.status === 'shipped' || project.status === 'published' ? 'Shipped' : 'In progress'}
+              </Tag>
             </motion.div>
 
             <motion.h1

@@ -1,46 +1,52 @@
 import { useEffect, useMemo, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
-import { skillCategories } from '../../data/skills.js'
-import { siteConfig } from '../../config.js'
+import { useSite } from '../../lib/usePublicData.js'
+import { getSkillCategories } from '../../lib/publicData.js'
 import { cn } from '../../utils/cn.js'
 import { CornerTicks } from '../ui/Panel.jsx'
 
 /**
  * Hero code visual.
  *
- * The object is generated from src/data/skills.js rather than written out, so
- * the snippet can never claim a technology the skills section does not list.
+ * The object is generated from the live skill categories (falling back to the
+ * static list before hydration) rather than written out, so the snippet can
+ * never claim a technology the skills section does not list. The identity
+ * lines (name/role) come from the live site profile via useSite().
  *
  * The type-on animation runs once, uses a single interval, and is skipped
  * entirely under `prefers-reduced-motion` — where the full snippet renders
  * immediately instead of animating faster.
  */
 
-const allSkillEntries = skillCategories.flatMap((category) => category.skills)
+function allEntries(categories) {
+  return categories.flatMap((category) => category.skills)
+}
 
 /** First `count` skills of a category, by name. */
-const pick = (categoryId, count) =>
-  skillCategories
-    .find((category) => category.id === categoryId)
-    ?.skills.slice(0, count)
-    .map((skill) => skill.name) ?? []
+function pick(categories, categoryId, count) {
+  return (
+    categories.find((category) => category.id === categoryId)?.skills.slice(0, count).map((skill) => skill.name) ?? []
+  )
+}
 
 /** Named skills, by id — for lines that need specific entries, not the first N. */
-const byIds = (...ids) =>
-  ids.map((id) => allSkillEntries.find((skill) => skill.id === id)?.name).filter(Boolean)
+function byIds(categories, ...ids) {
+  const entries = allEntries(categories)
+  return ids.map((id) => entries.find((skill) => skill.id === id)?.name).filter(Boolean)
+}
 
 const list = (values) => `[${values.map((value) => `"${value}"`).join(', ')}]`
 
-function buildSnippet() {
+function buildSnippet(name, title, categories) {
   return [
     'const developer = {',
-    `  name: "${siteConfig.name}",`,
-    `  role: "${siteConfig.title}",`,
-    `  frontend: ${list(pick('frontend', 2))},`,
-    `  backend: ${list(pick('backend', 2))},`,
-    `  database: ${list(pick('database', 2))},`,
-    `  security: ${list(byIds('jwt', 'bcrypt'))},`,
-    `  deploy: ${list(byIds('git', 'vercel'))},`,
+    `  name: "${name}",`,
+    `  role: "${title}",`,
+    `  frontend: ${list(pick(categories, 'frontend', 2))},`,
+    `  backend: ${list(pick(categories, 'backend', 2))},`,
+    `  database: ${list(pick(categories, 'database', 2))},`,
+    `  security: ${list(byIds(categories, 'jwt', 'bcrypt'))},`,
+    `  deploy: ${list(byIds(categories, 'git', 'vercel'))},`,
     '  buildsEndToEnd: true,',
     '}',
   ]
@@ -98,17 +104,17 @@ function Line({ text, lineNumber, showCursor }) {
   )
 }
 
-/**
- * Computed once at module scope: the snippet depends only on config and skill
- * data, neither of which changes at runtime.
- */
-const SNIPPET_LINES = buildSnippet()
-const SNIPPET_LENGTH = SNIPPET_LINES.join('\n').length
-
 export function CodeWindow({ className }) {
+  const { site } = useSite()
   const prefersReducedMotion = useReducedMotion()
-  const lines = SNIPPET_LINES
-  const fullLength = SNIPPET_LENGTH
+
+  // Rebuilt on hydration so identity (name/role) and skill lists stay live.
+  const categories = getSkillCategories()
+  const lines = useMemo(
+    () => buildSnippet(site.name, site.title, categories),
+    [site.name, site.title, categories],
+  )
+  const fullLength = useMemo(() => lines.join('\n').length, [lines])
 
   const [typedRaw, setTyped] = useState(0)
 

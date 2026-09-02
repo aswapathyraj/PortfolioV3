@@ -1,17 +1,28 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { usePublicData } from '../lib/usePublicData.js'
+import { getSite } from '../lib/publicData.js'
 
 const STORAGE_KEY = 'portfolio-theme'
 const ThemeContext = createContext(null)
 
-const readInitialTheme = () => {
-  if (typeof window === 'undefined') return 'dark'
-
+const readStoredTheme = () => {
+  if (typeof window === 'undefined') return null
   try {
     const stored = window.localStorage.getItem(STORAGE_KEY)
     if (stored === 'dark' || stored === 'light') return stored
   } catch {
-    // Private mode or blocked storage — fall through to the system preference.
+    return null
   }
+  return null
+}
+
+const readInitialTheme = () => {
+  if (typeof window === 'undefined') return 'dark'
+
+  // A stored choice is an explicit override. Otherwise fall through to the
+  // system preference (dark-first) — the CMS theme is applied on hydration.
+  const stored = readStoredTheme()
+  if (stored) return stored
 
   // Dark-first: only honour an explicit system preference for light.
   return window.matchMedia?.('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
@@ -22,10 +33,28 @@ const readInitialTheme = () => {
  *
  * Sets `data-theme` on <html>, which is all that is needed — the design system
  * resolves every colour through palette variables scoped to that attribute, so
- * no component carries theme-specific classes.
+ * no component carries theme-aware classes.
+ *
+ * The CMS appearance.theme sets the default; it only applies when the visitor
+ * has not explicitly chosen a theme, so the navbar toggle always wins once used.
  */
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(readInitialTheme)
+  const manualChoice = useRef(false)
+  const appliedCmsTheme = useRef(null)
+
+  // Listen for the live site data and adopt the admin's default theme, but only
+  // until the visitor makes their own choice. setState is only called when the
+  // CMS theme actually changes, so this stays idempotent across renders.
+  usePublicData()
+  useEffect(() => {
+    if (manualChoice.current) return
+    const cmsTheme = getSite().appearance?.theme
+    if ((cmsTheme === 'light' || cmsTheme === 'dark') && cmsTheme !== appliedCmsTheme.current) {
+      appliedCmsTheme.current = cmsTheme
+      setTheme(cmsTheme)
+    }
+  })
 
   useEffect(() => {
     const root = document.documentElement
@@ -44,6 +73,7 @@ export function ThemeProvider({ children }) {
   }, [theme])
 
   const toggleTheme = useCallback(() => {
+    manualChoice.current = true
     setTheme((current) => (current === 'dark' ? 'light' : 'dark'))
   }, [])
 

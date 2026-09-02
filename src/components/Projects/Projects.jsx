@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { projects, featuredProjects } from '../../data/projects.js'
+import { getProjects, getFeaturedProjects } from '../../lib/publicData.js'
+import { usePublicData } from '../../lib/usePublicData.js'
 import { Section, SectionHeader } from '../ui/Section.jsx'
 import { Button } from '../ui/Button.jsx'
 import { Icon } from '../ui/Icon.jsx'
@@ -22,6 +23,9 @@ import { viewport } from '../../animations/transitions.js'
  */
 export function Projects() {
   const { focusedSkill, clearFocus } = useSkillFocus()
+  usePublicData()
+  const projects = getProjects()
+  const featuredProjects = getFeaturedProjects()
 
   const secondary = projects.filter((project) => !project.featured)
   const matchCount = focusedSkill

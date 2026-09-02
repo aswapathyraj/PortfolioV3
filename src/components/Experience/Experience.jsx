@@ -1,8 +1,13 @@
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
-import { experience, education, experienceNote } from '../../data/experience.js'
-import { getProjectBySlug } from '../../data/projects.js'
-import { resolveSkillNames } from '../../data/skills.js'
+import {
+  getExperience,
+  getEducation,
+  getExperienceNote,
+  getProjectBySlug,
+  resolveSkillNames,
+} from '../../lib/publicData.js'
+import { usePublicData } from '../../lib/usePublicData.js'
 import { Section, SectionHeader } from '../ui/Section.jsx'
 import { Icon } from '../ui/Icon.jsx'
 import { Tag, StatusDot } from '../ui/Tag.jsx'
@@ -18,6 +23,11 @@ import { viewport } from '../../animations/transitions.js'
  * empty education list simply renders nothing.
  */
 export function Experience() {
+  usePublicData()
+  const experience = getExperience()
+  const education = getEducation()
+  const experienceNote = getExperienceNote()
+
   return (
     <Section id="experience">
       <SectionHeader

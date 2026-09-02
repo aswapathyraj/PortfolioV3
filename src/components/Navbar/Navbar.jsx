@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { navLinks, sectionIds } from '../../data/navigation.js'
-import { siteConfig } from '../../config.js'
+import { useSite } from '../../lib/usePublicData.js'
 import { cn } from '../../utils/cn.js'
 import { scrollToSection } from '../../utils/scroll.js'
 import { useActiveSection } from '../../hooks/useActiveSection.js'
@@ -26,6 +26,7 @@ export function Navbar() {
   const location = useLocation()
   const navigate = useNavigate()
   const isHome = location.pathname === '/'
+  const { site } = useSite()
 
   const scrolled = useScrolledPast(24)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -84,7 +85,7 @@ export function Navbar() {
           <button
             type="button"
             onClick={() => goToSection('home')}
-            aria-label={`${siteConfig.name} — back to top`}
+            aria-label={`${site.name} — back to top`}
             className="shrink-0 rounded-lg py-1 text-left"
           >
             <Logo compact />

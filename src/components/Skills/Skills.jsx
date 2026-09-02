@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
-import { skillCategories, allSkills } from '../../data/skills.js'
+import { getSkillCategories, getAllSkills } from '../../lib/publicData.js'
+import { usePublicData } from '../../lib/usePublicData.js'
 import { Section, SectionHeader } from '../ui/Section.jsx'
 import { Icon } from '../ui/Icon.jsx'
 import { Button } from '../ui/Button.jsx'
@@ -23,6 +24,12 @@ import { viewport } from '../../animations/transitions.js'
  * the matching cards.
  */
 export function Skills() {
+  // Subscribe to live data swaps (re-renders after hydration) and read content
+  // through the accessors so the section reflects CMS changes.
+  usePublicData()
+  const skillCategories = getSkillCategories()
+  const allSkills = getAllSkills()
+
   const [categoryIndex, setCategoryIndex] = useState(0)
   const category = skillCategories[categoryIndex]
 
@@ -38,7 +45,10 @@ export function Skills() {
     ? selectedId
     : category.skills[0].id
 
-  const selected = useMemo(() => allSkills.find((skill) => skill.id === activeId), [activeId])
+  const selected = useMemo(
+    () => allSkills.find((skill) => skill.id === activeId),
+    [activeId, allSkills],
+  )
 
   // Publish the selection so Projects can highlight matching cards, and clear it
   // when this section unmounts so no stale highlight is left behind.

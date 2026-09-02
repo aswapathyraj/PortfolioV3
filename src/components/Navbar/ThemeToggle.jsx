@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useTheme } from '../../hooks/useTheme.jsx'
-import { siteConfig } from '../../config.js'
+import { useSite } from '../../lib/usePublicData.js'
 import { Icon } from '../ui/Icon.jsx'
 import { cn } from '../../utils/cn.js'
 
@@ -12,9 +12,10 @@ import { cn } from '../../utils/cn.js'
  * attribute, so no component needs theme-aware classes.
  */
 export function ThemeToggle({ className }) {
+  const { site } = useSite()
   const { theme, toggleTheme } = useTheme()
 
-  if (!siteConfig.features.themeToggle) return null
+  if (!site.features.themeToggle) return null
 
   const next = theme === 'dark' ? 'light' : 'dark'
 

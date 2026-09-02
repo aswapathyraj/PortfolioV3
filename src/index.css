@@ -34,6 +34,8 @@
   --color-accent2: var(--p-accent2);
   --color-accent2-soft: var(--p-accent2-soft);
 
+  --color-scrim: var(--p-scrim);
+
   --color-success: var(--p-success);
   --color-warn: var(--p-warn);
   --color-danger: var(--p-danger);

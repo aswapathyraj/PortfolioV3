@@ -102,13 +102,18 @@ export const absoluteUrl = (path = '/') => {
 
 /** Fields that must be filled before this is ready to publish. */
 export const requiredConfigKeys = [
-  ['email', siteConfig.email],
-  ['github', siteConfig.github],
-  ['linkedin', siteConfig.linkedin],
-  ['resume', siteConfig.resume],
-  ['githubUsername', siteConfig.githubUsername],
-  ['siteUrl', siteConfig.siteUrl],
+  'email',
+  'github',
+  'linkedin',
+  'resume',
+  'githubUsername',
+  'siteUrl',
 ]
 
-export const missingConfigKeys = () =>
-  requiredConfigKeys.filter(([, value]) => !isConfigured(value)).map(([key]) => key)
+/**
+ * Which required fields are still empty. Accepts an optional live site object
+ * (from the public data store) so the checklist reflects CMS edits rather than
+ * only the static defaults; without one it falls back to static src/config.js.
+ */
+export const missingConfigKeys = (site = siteConfig) =>
+  requiredConfigKeys.filter((key) => !isConfigured(site[key])).map((key) => key)

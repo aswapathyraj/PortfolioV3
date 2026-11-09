@@ -43,9 +43,42 @@ export function HomePage() {
     if (!location.hash) return
 
     const id = location.hash.slice(1)
+    const isCard = id.startsWith('project-')
+
+    // Project cards must sit just below the navbar when returning from a
+    // case study. Their own scroll-mt (112px) stacks on top of the global
+    // scroll-padding (96px), leaving 208px of "Selected Work" header above
+    // the card on mobile — so cards get an explicit top instead.
+    const land = (forceInstant) => {
+      const element = document.getElementById(id)
+      if (!element) return false
+      if (isCard) {
+        const top = element.getBoundingClientRect().top + window.scrollY - 96
+        window.scrollTo({ top: Math.max(0, top), behavior: forceInstant ? 'instant' : 'auto' })
+        return true
+      }
+      return scrollToSection(id, { updateHash: false, instant: forceInstant })
+    }
 
     // One frame so the target section exists before we measure it.
-    const frame = requestAnimationFrame(() => scrollToSection(id, { updateHash: false, instant }))
+    const frame = requestAnimationFrame(() => {
+      // The home page mounts after the detail page's exit animation, so the
+      // card can be absent on the first frame. Poll briefly until it exists
+      // instead of giving up — otherwise mobile backs land at y=0.
+      let attempts = 0
+      const poll = () => {
+        if (land(instant)) {
+          // Land once more after layout settles: the skill-highlight banner
+          // and card entrance animations push the cards down after the first
+          // scroll, which left the section header in view instead of the card.
+          if (instant) setTimeout(() => land(true), 450)
+          return
+        }
+        attempts += 1
+        if (attempts < 20) setTimeout(poll, 100)
+      }
+      poll()
+    })
     return () => cancelAnimationFrame(frame)
   }, [location.hash])
 

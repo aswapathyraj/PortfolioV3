@@ -9,111 +9,21 @@ import { Icon } from '../ui/Icon.jsx'
  * When a project has a screenshot it is rendered lazily, with a decode hint and
  * a real error path — a broken file falls back rather than leaving a gap.
  *
- * When there is no screenshot yet, this draws a miniature of the project's own
- * architecture from its data instead of a stock mockup. The miniature borrows
- * the System Architecture section's visual language (layered nodes, accent
- * edge bars, dotted canvas, connector lines) inside the browser frame from the
- * case-study page. It is honest about being a diagram, and it still tells the
- * reader something about the system.
+ * Without one, this draws a schematic of the project's own architecture from
+ * its data: a dotted rail with one dot per layer, hairline-separated rows, and
+ * the layer's name in display type with its kind in muted mono on the right —
+ * the same visual language as the Database section's schema tables, not a fake
+ * application window.
  */
 
 const toneStyles = {
-  neutral: {
-    border: 'border-line',
-    bg: 'bg-surface',
-    icon: 'text-subtle',
-    dot: 'bg-subtle',
-  },
-  accent: {
-    border: 'border-line',
-    bg: 'bg-surface',
-    icon: 'text-accent',
-    dot: 'bg-accent',
-  },
-  accent2: {
-    border: 'border-line',
-    bg: 'bg-surface',
-    icon: 'text-accent2',
-    dot: 'bg-accent2',
-  },
-  warn: {
-    border: 'border-line',
-    bg: 'bg-surface',
-    icon: 'text-warn',
-    dot: 'bg-warn',
-  },
+  neutral: { dot: 'bg-subtle' },
+  accent: { dot: 'bg-accent' },
+  accent2: { dot: 'bg-accent2' },
+  warn: { dot: 'bg-warn' },
 }
 
 const toneFor = (kind) => toneStyles[nodeKinds[kind]?.tone ?? 'neutral'] ?? toneStyles.neutral
-
-/** Compact static connector between two rows — vertical line or fan-out branch. */
-function Connector({ branching = false }) {
-  if (branching) {
-    return (
-      <svg
-        viewBox="0 0 200 8"
-        preserveAspectRatio="none"
-        className="h-1.5 w-full @[26rem]:h-3"
-        aria-hidden="true"
-      >
-        <path
-          d="M100 0 V4.5 M22 8 V6.5 Q22 4.5 100 4.5 Q178 4.5 178 6.5 V8"
-          fill="none"
-          stroke="var(--p-line-strong)"
-          strokeWidth="1"
-          vectorEffect="non-scaling-stroke"
-        />
-      </svg>
-    )
-  }
-
-  return (
-    <svg viewBox="0 0 2 12" preserveAspectRatio="none" className="h-1.5 w-px @[26rem]:h-3" aria-hidden="true">
-      <path d="M1 0 V12" fill="none" stroke="var(--p-line-strong)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
-      <circle cx="1" cy="10" r="1.1" fill="var(--p-accent)" opacity="0.8" />
-    </svg>
-  )
-}
-
-/** Compact static node, visually matched to the System Architecture nodes. */
-function MiniNode({ node }) {
-  const tone = toneFor(node.kind)
-
-  return (
-    <div
-      className={cn(
-        'relative min-w-0 flex-1 overflow-hidden rounded-lg border px-1.5 py-1 sm:px-2 sm:py-1.5',
-        tone.bg,
-        tone.border,
-      )}
-    >
-      <span
-        className={cn('absolute left-0 top-1.5 h-[calc(100%-0.75rem)] w-0.5 rounded-r-full opacity-40', tone.dot)}
-        aria-hidden="true"
-      />
-      <div className="flex items-center gap-1.5 pl-1 sm:gap-2">
-        <span
-          className={cn(
-            'flex size-4 shrink-0 items-center justify-center rounded border border-line bg-sunken @[26rem]:size-6',
-            tone.icon,
-          )}
-        >
-          <Icon name={node.icon} className="size-2 @[26rem]:size-3" />
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="block truncate-safe font-display text-[0.5625rem] leading-tight text-fg/90 @[26rem]:text-[0.6875rem]">
-            {node.label}
-          </span>
-          {node.sub ? (
-            <span className="mt-0.5 hidden truncate-safe font-mono text-[0.4375rem] text-subtle @[26rem]:block">
-              {node.sub}
-            </span>
-          ) : null}
-        </span>
-      </div>
-    </div>
-  )
-}
 
 function ArchitectureMiniature({ project }) {
   const rows = project.architecture?.rows ?? []
@@ -125,53 +35,57 @@ function ArchitectureMiniature({ project }) {
 
   return (
     <div className="relative flex h-full flex-col" role="img" aria-label={ariaLabel}>
-      {/* Browser chrome: traffic lights + address bar with the case-study path */}
-      <div className="flex items-center gap-2 border-b border-line bg-elevated/60 px-2.5 py-1.5 sm:gap-2.5 sm:px-3 sm:py-2">
-        <span className="flex shrink-0 gap-1.5" aria-hidden="true">
-          <span className="size-2 rounded-full bg-[#ff5f57]/80" />
-          <span className="size-2 rounded-full bg-[#febc2e]/80" />
-          <span className="size-2 rounded-full bg-[#28c840]/80" />
-        </span>
-        <span className="flex min-w-0 flex-1 items-center gap-1.5 rounded-md border border-line bg-sunken px-2 py-1">
-          <Icon name="shieldCheck" className="size-3 shrink-0 text-accent" />
-          <span className="truncate-safe font-mono text-[0.5625rem] text-subtle sm:text-[0.625rem]">
-            /projects/{project.slug}/architecture
-          </span>
-        </span>
-        <span
-          aria-hidden="true"
-          className="flex size-4 shrink-0 items-center justify-center rounded-[3px] bg-accent font-mono text-[0.5625rem] font-bold text-on-accent"
-        >
-          {project.slug?.[0]?.toUpperCase() ?? '?'}
-        </span>
-      </div>
+      {/* Schematic body */}
+      <div className="flex min-h-0 flex-1 flex-col justify-center border-y border-line px-5 py-3 sm:px-6">
+        <div className="relative">
+          {/* Dotted rail */}
+          <span
+            aria-hidden="true"
+            className="absolute bottom-2 left-[3px] top-2 border-l border-dotted border-line-strong"
+          />
 
-      {/* Layered node diagram — Static render of the reference pattern */}
-      <div className="relative min-h-0 flex-1 overflow-hidden">
-        <div className="grid-field-sm pointer-events-none absolute inset-0 opacity-40" aria-hidden="true" />
-        <div className="relative flex h-full flex-col justify-center p-2 sm:p-3">
-          {rows.map((row, rowIndex) => (
-            <div key={rowIndex} className="contents">
-              <div className="flex flex-row gap-1.5 sm:gap-2">
-                {row.map((node) => (
-                  <MiniNode key={node.id} node={node} />
-                ))}
+          {rows.map((row, rowIndex) => {
+            const firstKind = row[0]?.kind
+            const tone = toneFor(firstKind)
+            const kindLabel = nodeKinds[firstKind]?.label ?? firstKind
+            const names = row.map((node) => node.label).join(' · ')
+
+            return (
+              <div
+                key={rowIndex}
+                className="relative flex items-center gap-3 border-b border-line/50 py-1.5 pl-4 last:border-b-0 sm:gap-4 sm:py-2"
+              >
+                <span
+                  className={cn(
+                    'absolute left-0 top-1/2 size-[7px] -translate-y-1/2 rounded-full',
+                    tone.dot,
+                    rowIndex === 0 && 'bg-accent',
+                  )}
+                  aria-hidden="true"
+                />
+                <span className="mono-label tnum w-6 shrink-0 text-[0.625rem] text-subtle">
+                  0{rowIndex + 1}
+                </span>
+                <span className="min-w-0 flex-1 truncate-safe font-display text-[0.75rem] text-fg sm:text-[0.8125rem] lg:text-[0.875rem]">
+                  {names}
+                </span>
+                <span className="mono-label shrink-0 text-[0.4375rem] text-subtle sm:text-[0.5rem]">
+                  {kindLabel}
+                </span>
               </div>
-              {rowIndex < rows.length - 1 ? (
-                <Connector branching={rows[rowIndex + 1].length > 1} />
-              ) : null}
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
 
-      {/* Browser status bar */}
-      <div className="flex items-center justify-between gap-2 border-t border-line bg-elevated/60 px-2.5 py-1 sm:px-3">
-        <span className="mono-label flex items-center gap-1.5 text-[0.5rem] sm:text-[0.5625rem]">
-          <span className="size-1.5 rounded-full bg-accent" aria-hidden="true" />
-          Architecture preview
+      {/* Caption strip */}
+      <div className="flex items-center justify-between gap-3 px-5 py-2 sm:px-6">
+        <span className="shrink-0 font-mono text-[0.4375rem] uppercase tracking-[0.14em] text-subtle">
+          Project architecture
         </span>
-        <span className="mono-label text-[0.5rem] text-subtle sm:text-[0.5625rem]">{layerCount} layers</span>
+        <span className="shrink-0 font-mono text-[0.4375rem] uppercase tracking-[0.14em] text-subtle">
+          {layerCount} layers · request flows down
+        </span>
       </div>
     </div>
   )
@@ -184,7 +98,7 @@ export function ProjectVisual({ project, className, aspect = 'aspect-[16/11]' })
   return (
     <div
       className={cn(
-        '@container relative overflow-hidden rounded-panel border border-line bg-sunken',
+        'relative overflow-hidden rounded-panel border border-line bg-sunken',
         aspect,
         className,
       )}

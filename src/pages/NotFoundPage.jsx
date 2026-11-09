@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { getRealProjects } from '../lib/publicData.js'
 import { usePublicData } from '../lib/usePublicData.js'
@@ -17,6 +18,11 @@ export function NotFoundPage({ reason = 'route', slug }) {
   const isProject = reason === 'project'
   usePublicData()
   const realProjects = getRealProjects()
+
+  // Start at the top rather than at whatever offset the previous page had.
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }, [reason, slug])
 
   return (
     <>

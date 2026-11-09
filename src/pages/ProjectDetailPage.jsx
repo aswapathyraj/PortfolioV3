@@ -48,9 +48,11 @@ export function ProjectDetailPage() {
   usePublicData()
   const project = getProjectBySlug(slug)
 
-  // Start each case study at the top rather than mid-page.
+  // Start each case study at the top rather than mid-page. `instant` is
+  // required: `auto` would defer to the CSS `scroll-behavior: smooth` and
+  // glide visibly from the previous scroll depth.
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'auto' })
+    window.scrollTo({ top: 0, behavior: 'instant' })
   }, [slug])
 
   const { previous, next } = useMemo(() => {

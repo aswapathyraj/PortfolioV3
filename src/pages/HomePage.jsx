@@ -37,10 +37,16 @@ export function HomePage() {
   const landedRef = useRef(false)
 
   // Arriving from a case study at /#skills should land on that section.
+  // On an initial browser reload, skip the hash landing instead: App already
+  // scrolled to the top, and a refresh must start there even when the URL
+  // still carries #project-...
   useEffect(() => {
-    const instant = !landedRef.current
+    const isFirst = !landedRef.current
+    const instant = isFirst
     landedRef.current = true
     if (!location.hash) return
+
+    if (isFirst && performance.getEntriesByType('navigation')[0]?.type === 'reload') return
 
     const id = location.hash.slice(1)
     const isCard = id.startsWith('project-')

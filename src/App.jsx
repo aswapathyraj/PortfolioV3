@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect } from 'react'
+import { Suspense, lazy, useEffect, useRef } from 'react'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import { AnimatePresence, MotionConfig, motion } from 'framer-motion'
 import { ThemeProvider } from './hooks/useTheme.jsx'
@@ -103,9 +103,17 @@ export default function App() {
   // Every route change starts at the top. Without this a refresh / server
   // restart restores the browser's previous scroll offset (e.g. on the
   // project cards); route pushes without a hash had the same gap.
-  // Hash deep-links are left to HomePage's own instant-scroll handling.
+  // Hash deep-links are left to HomePage's own instant-scroll handling —
+  // except on the initial reload, where the hash would otherwise re-land
+  // on the card and the visitor instead expects the top. Once the first
+  // mount is consumed, in-app back-links land on the card as before.
+  const initialScrollRef = useRef(true)
   useEffect(() => {
-    if (hash) return
+    const isInitialReload =
+      initialScrollRef.current &&
+      performance.getEntriesByType('navigation')[0]?.type === 'reload'
+    initialScrollRef.current = false
+    if (hash && !isInitialReload) return
     window.scrollTo({ top: 0, behavior: 'instant' })
   }, [pathname, hash])
 

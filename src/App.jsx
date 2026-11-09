@@ -97,8 +97,17 @@ function usePublicHydration() {
 
 export default function App() {
   useConfigChecklist()
-  const { pathname } = useLocation()
+  const { pathname, hash } = useLocation()
   const isAdmin = pathname === '/admin' || pathname.startsWith('/admin/')
+
+  // Every route change starts at the top. Without this a refresh / server
+  // restart restores the browser's previous scroll offset (e.g. on the
+  // project cards); route pushes without a hash had the same gap.
+  // Hash deep-links are left to HomePage's own instant-scroll handling.
+  useEffect(() => {
+    if (hash) return
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }, [pathname, hash])
 
   // Only the public site loads live CMS content; the console keeps its own.
   usePublicHydration()

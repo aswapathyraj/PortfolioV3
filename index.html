@@ -6,6 +6,15 @@
     <meta name="color-scheme" content="dark light" />
     <meta name="theme-color" content="#08090A" />
 
+    <!-- SPA owns scroll position: stop Chrome restoring the previous page's
+         mid-page offset on refresh / restart (would land on the project
+         cards instead of the hero). -->
+    <script>
+      if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual'
+      }
+    </script>
+
     <!--
       Static copies of the primary tags so crawlers that do not execute JS still
       get them. The live values are driven from src/config.js via <Seo /> — keep

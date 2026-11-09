@@ -28,7 +28,7 @@ function ArchitectureMiniature({ project }) {
   return (
     <div className="relative flex h-full flex-col">
       {/* Window chrome */}
-      <div className="flex items-center gap-2 border-b border-line bg-elevated/60 px-3 py-2">
+      <div className="flex items-center gap-2 border-b border-line bg-elevated/60 px-3 py-1.5 sm:py-2">
         <span className="flex gap-1.5" aria-hidden="true">
           <span className="size-2 rounded-full bg-line-strong" />
           <span className="size-2 rounded-full bg-line-strong" />
@@ -39,14 +39,14 @@ function ArchitectureMiniature({ project }) {
         </span>
       </div>
 
-      <div className="grid-field-sm relative flex flex-1 flex-col justify-center gap-1.5 p-3.5 sm:gap-2 sm:p-5">
+      <div className="grid-field-sm relative flex min-h-0 flex-1 flex-col justify-center gap-1 overflow-hidden p-2.5 sm:gap-1.5 sm:p-3.5">
         {rows.map((row, rowIndex) => (
-          <div key={rowIndex} className="flex flex-col items-stretch gap-1.5">
+          <div key={rowIndex} className="flex flex-col items-stretch gap-1">
             <div className="flex items-stretch justify-center gap-1.5 sm:gap-2">
               {row.map((node) => (
                 <div
                   key={node.id}
-                  className="flex min-w-0 flex-1 items-center gap-2 rounded-md border border-line bg-surface/90 px-2 py-1.5 backdrop-blur-sm sm:px-2.5 sm:py-2"
+                  className="flex min-w-0 flex-1 items-center gap-2 rounded-md border border-line bg-surface/90 px-2 py-1 backdrop-blur-sm sm:px-2.5 sm:py-1.5"
                 >
                   <span
                     className={cn('size-1.5 shrink-0 rounded-full', kindDot[node.kind] ?? 'bg-subtle')}
@@ -64,14 +64,14 @@ function ArchitectureMiniature({ project }) {
 
             {rowIndex < rows.length - 1 ? (
               <div className="flex justify-center" aria-hidden="true">
-                <span className="h-2 w-px bg-line-strong sm:h-2.5" />
+                <span className="h-1.5 w-px bg-line-strong" />
               </div>
             ) : null}
           </div>
         ))}
       </div>
 
-      <div className="flex items-center justify-between gap-2 border-t border-line bg-elevated/60 px-3 py-1.5">
+      <div className="flex items-center justify-between gap-2 border-t border-line bg-elevated/60 px-3 py-1">
         <span className="mono-label text-[0.5625rem]">Architecture preview</span>
         <span className="mono-label text-[0.5625rem]">{rows.length} layers</span>
       </div>

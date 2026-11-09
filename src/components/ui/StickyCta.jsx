@@ -5,7 +5,6 @@ import { useSite } from '../../lib/usePublicData.js'
 import { scrollToSection } from '../../utils/scroll.js'
 import { Icon } from '../ui/Icon.jsx'
 import { Button } from '../ui/Button.jsx'
-import { ResumeButton } from '../ui/SocialLinks.jsx'
 
 /**
  * Persistent Contact CTA — a mobile-only bottom bar.
@@ -59,7 +58,6 @@ export function StickyCta() {
             >
               Let&rsquo;s Connect
             </Button>
-            <ResumeButton size="sm" variant="secondary" />
             <a
               href={`mailto:${site.email ?? ''}`}
               aria-label="Email directly"

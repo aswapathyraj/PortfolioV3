@@ -13,7 +13,6 @@ import { Seo } from '../components/ui/Seo.jsx'
 import { Button } from '../components/ui/Button.jsx'
 import { Icon } from '../components/ui/Icon.jsx'
 import { Tag } from '../components/ui/Tag.jsx'
-import { EmptyState } from '../components/ui/EmptyState.jsx'
 import { Reveal } from '../components/ui/Reveal.jsx'
 import { ProjectVisual } from '../components/Projects/ProjectVisual.jsx'
 import { FlowDiagram, FlowLegend } from '../components/Architecture/FlowDiagram.jsx'
@@ -82,7 +81,7 @@ export function ProjectDetailPage() {
     project.auth?.length && { id: 'authentication', label: 'Authentication' },
     project.challenges.length && { id: 'challenges', label: 'Challenges' },
     project.learnings.length && { id: 'learnings', label: 'What I learned' },
-    { id: 'screenshots', label: 'Screenshots' },
+    project.screenshots?.length ? { id: 'screenshots', label: 'Screenshots' } : null,
     { id: 'links', label: 'Links' },
   ].filter(Boolean)
 
@@ -98,11 +97,12 @@ export function ProjectDetailPage() {
         type="article"
       />
 
-      <article className="pb-20 pt-28 sm:pt-32">
-        {/* ---- Header ---- */}
+      <article className="pb-20 pt-24 sm:pt-28">
+        {/* ---- Hero: header and visual side by side on desktop ---- */}
         <Container>
-          <motion.div variants={staggerContainer(0.07)} initial="hidden" animate="visible">
-            <motion.div variants={fadeUp(10)}>
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:items-center lg:gap-14">
+            <motion.div variants={staggerContainer(0.07)} initial="hidden" animate="visible">
+              <motion.div variants={fadeUp(10)}>
               <Link
                 to={`/#project-${project.slug}`}
                 className="group inline-flex items-center gap-2 text-[0.8125rem] text-muted transition-colors duration-200 hover:text-fg"
@@ -163,13 +163,11 @@ export function ProjectDetailPage() {
               )}
             </motion.div>
           </motion.div>
-        </Container>
 
-        {/* ---- Visual ---- */}
-        <Container className="mt-10">
-          <Reveal>
-            <ProjectVisual project={project} aspect="aspect-[16/9] sm:aspect-[2/1]" />
-          </Reveal>
+            <Reveal className="lg:pl-2">
+              <ProjectVisual project={project} aspect="aspect-[4/3]" />
+            </Reveal>
+          </div>
         </Container>
 
         {/* ---- Body ---- */}
@@ -378,9 +376,9 @@ export function ProjectDetailPage() {
                 </CaseSection>
               ) : null}
 
-              {/* Screenshots — honest empty state until files exist. */}
-              <CaseSection id="screenshots" index={nextIndex()} title="Screenshots">
-                {project.screenshots?.length ? (
+              {/* Screenshots — omitted entirely until files exist. */}
+              {project.screenshots?.length ? (
+                <CaseSection id="screenshots" index={nextIndex()} title="Screenshots">
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     {project.screenshots.map((shot) => (
                       <figure
@@ -402,14 +400,8 @@ export function ProjectDetailPage() {
                       </figure>
                     ))}
                   </div>
-                ) : (
-                  <EmptyState
-                    icon="empty"
-                    title="No screenshots added yet"
-                    description="Drop images into public/ and add them to this project's `screenshots` array in src/data/projects.js. Until then the architecture preview above stands in."
-                  />
-                )}
-              </CaseSection>
+                </CaseSection>
+              ) : null}
 
               {/* Links */}
               <CaseSection id="links" index={nextIndex()} title="Links">

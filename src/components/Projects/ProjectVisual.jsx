@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { nodeKinds } from '../../data/architecture.js'
 import { cn } from '../../utils/cn.js'
 import { Icon } from '../ui/Icon.jsx'
 
@@ -9,52 +10,114 @@ import { Icon } from '../ui/Icon.jsx'
  * a real error path — a broken file falls back rather than leaving a gap.
  *
  * When there is no screenshot yet, this draws a miniature of the project's own
- * architecture from its data instead of a stock mockup. The miniature is
- * framed as the project's case-study URL in a browser window, and the layers
- * are drawn as a node graph: SVG connectors between rows, HTML nodes on top.
- * It is honest about being a diagram, and it still tells the reader something
- * about the system.
+ * architecture from its data instead of a stock mockup. The miniature borrows
+ * the System Architecture section's visual language (layered nodes, accent
+ * edge bars, dotted canvas, connector lines) inside the browser frame from the
+ * case-study page. It is honest about being a diagram, and it still tells the
+ * reader something about the system.
  */
 
-/** Icon + accent per node kind. Drives the graph's colour language. */
-const KIND_META = {
-  client: { icon: 'users', iconClass: 'text-subtle' },
-  edge: { icon: 'monitor', iconClass: 'text-accent' },
-  api: { icon: 'network', iconClass: 'text-accent' },
-  service: { icon: 'server', iconClass: 'text-accent2' },
-  data: { icon: 'database', iconClass: 'text-warn' },
-  infra: { icon: 'rocket', iconClass: 'text-subtle' },
+const toneStyles = {
+  neutral: {
+    border: 'border-line',
+    bg: 'bg-surface',
+    icon: 'text-subtle',
+    dot: 'bg-subtle',
+  },
+  accent: {
+    border: 'border-line',
+    bg: 'bg-surface',
+    icon: 'text-accent',
+    dot: 'bg-accent',
+  },
+  accent2: {
+    border: 'border-line',
+    bg: 'bg-surface',
+    icon: 'text-accent2',
+    dot: 'bg-accent2',
+  },
+  warn: {
+    border: 'border-line',
+    bg: 'bg-surface',
+    icon: 'text-warn',
+    dot: 'bg-warn',
+  },
 }
 
-/** Node width per row density (keeps every layer on one line). */
-const nodeWidth = (rowLength) =>
-  rowLength >= 3 ? 'max-w-[30%]' : rowLength === 2 ? 'max-w-[40%]' : 'max-w-[48%]'
+const toneFor = (kind) => toneStyles[nodeKinds[kind]?.tone ?? 'neutral'] ?? toneStyles.neutral
+
+/** Compact static connector between two rows — vertical line or fan-out branch. */
+function Connector({ branching = false }) {
+  if (branching) {
+    return (
+      <svg
+        viewBox="0 0 200 8"
+        preserveAspectRatio="none"
+        className="h-1.5 w-full @[26rem]:h-3"
+        aria-hidden="true"
+      >
+        <path
+          d="M100 0 V4.5 M22 8 V6.5 Q22 4.5 100 4.5 Q178 4.5 178 6.5 V8"
+          fill="none"
+          stroke="var(--p-line-strong)"
+          strokeWidth="1"
+          vectorEffect="non-scaling-stroke"
+        />
+      </svg>
+    )
+  }
+
+  return (
+    <svg viewBox="0 0 2 12" preserveAspectRatio="none" className="h-1.5 w-px @[26rem]:h-3" aria-hidden="true">
+      <path d="M1 0 V12" fill="none" stroke="var(--p-line-strong)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+      <circle cx="1" cy="10" r="1.1" fill="var(--p-accent)" opacity="0.8" />
+    </svg>
+  )
+}
+
+/** Compact static node, visually matched to the System Architecture nodes. */
+function MiniNode({ node }) {
+  const tone = toneFor(node.kind)
+
+  return (
+    <div
+      className={cn(
+        'relative min-w-0 flex-1 overflow-hidden rounded-lg border px-1.5 py-1 sm:px-2 sm:py-1.5',
+        tone.bg,
+        tone.border,
+      )}
+    >
+      <span
+        className={cn('absolute left-0 top-1.5 h-[calc(100%-0.75rem)] w-0.5 rounded-r-full opacity-40', tone.dot)}
+        aria-hidden="true"
+      />
+      <div className="flex items-center gap-1.5 pl-1 sm:gap-2">
+        <span
+          className={cn(
+            'flex size-4 shrink-0 items-center justify-center rounded border border-line bg-sunken @[26rem]:size-6',
+            tone.icon,
+          )}
+        >
+          <Icon name={node.icon} className="size-2 @[26rem]:size-3" />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block truncate-safe font-display text-[0.5625rem] leading-tight text-fg/90 @[26rem]:text-[0.6875rem]">
+            {node.label}
+          </span>
+          {node.sub ? (
+            <span className="mt-0.5 hidden truncate-safe font-mono text-[0.4375rem] text-subtle @[26rem]:block">
+              {node.sub}
+            </span>
+          ) : null}
+        </span>
+      </div>
+    </div>
+  )
+}
 
 function ArchitectureMiniature({ project }) {
   const rows = project.architecture?.rows ?? []
   const layerCount = rows.length
-
-  // Every child node connects to every parent node in the previous row.
-  const edges = []
-  rows.forEach((row, rowIndex) => {
-    if (rowIndex === 0) return
-    row.forEach((_, childIndex) => {
-      rows[rowIndex - 1].forEach((__, parentIndex) => {
-        edges.push({
-          key: `${rowIndex}-${childIndex}-${parentIndex}`,
-          from: {
-            x: ((parentIndex + 0.5) / rows[rowIndex - 1].length) * 100,
-            y: ((rowIndex - 0.5) / layerCount) * 100,
-          },
-          to: {
-            x: ((childIndex + 0.5) / row.length) * 100,
-            y: ((rowIndex + 0.5) / layerCount) * 100,
-          },
-        })
-      })
-    })
-  })
-
   const ariaLabel = `${project.title} architecture: ${rows
     .flat()
     .map((node) => node.label)
@@ -83,51 +146,23 @@ function ArchitectureMiniature({ project }) {
         </span>
       </div>
 
-      {/* Graph canvas */}
-      <div className="grid-field-sm relative min-h-0 flex-1">
-        <svg
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-          className="absolute inset-0 size-full"
-          aria-hidden="true"
-        >
-          {edges.map((edge) => {
-            const midY = (edge.from.y + edge.to.y) / 2
-            return (
-              <path
-                key={edge.key}
-                d={`M ${edge.from.x} ${edge.from.y} C ${edge.from.x} ${midY} ${edge.to.x} ${midY} ${edge.to.x} ${edge.to.y}`}
-                fill="none"
-                stroke="var(--p-line-strong)"
-                strokeWidth="1"
-                vectorEffect="non-scaling-stroke"
-              />
-            )
-          })}
-        </svg>
-
-        {rows.map((row, rowIndex) =>
-          row.map((node, nodeIndex) => {
-            const meta = KIND_META[node.kind] ?? KIND_META.service
-            const x = ((nodeIndex + 0.5) / row.length) * 100
-            const y = ((rowIndex + 0.5) / layerCount) * 100
-            return (
-              <div
-                key={node.id}
-                style={{ left: `${x}%`, top: `${y}%` }}
-                className={cn(
-                  'absolute z-10 flex -translate-x-1/2 -translate-y-1/2 items-center gap-1.5 rounded-md border border-line-strong bg-elevated/90 px-1.5 py-1 shadow-panel backdrop-blur-sm sm:gap-2 sm:px-2 sm:py-1.5',
-                  nodeWidth(row.length),
-                )}
-              >
-                <Icon name={meta.icon} className={cn('size-3 shrink-0 sm:size-3.5', meta.iconClass)} />
-                <span className="min-w-0 truncate-safe font-mono text-[0.5rem] leading-tight text-fg sm:text-[0.625rem]">
-                  {node.label}
-                </span>
+      {/* Layered node diagram — Static render of the reference pattern */}
+      <div className="relative min-h-0 flex-1 overflow-hidden">
+        <div className="grid-field-sm pointer-events-none absolute inset-0 opacity-40" aria-hidden="true" />
+        <div className="relative flex h-full flex-col justify-center p-2 sm:p-3">
+          {rows.map((row, rowIndex) => (
+            <div key={rowIndex} className="contents">
+              <div className="flex flex-row gap-1.5 sm:gap-2">
+                {row.map((node) => (
+                  <MiniNode key={node.id} node={node} />
+                ))}
               </div>
-            )
-          }),
-        )}
+              {rowIndex < rows.length - 1 ? (
+                <Connector branching={rows[rowIndex + 1].length > 1} />
+              ) : null}
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Browser status bar */}
@@ -149,7 +184,7 @@ export function ProjectVisual({ project, className, aspect = 'aspect-[16/11]' })
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-panel border border-line bg-sunken',
+        '@container relative overflow-hidden rounded-panel border border-line bg-sunken',
         aspect,
         className,
       )}

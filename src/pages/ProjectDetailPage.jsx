@@ -104,7 +104,7 @@ export function ProjectDetailPage() {
           <motion.div variants={staggerContainer(0.07)} initial="hidden" animate="visible">
             <motion.div variants={fadeUp(10)}>
               <Link
-                to="/#projects"
+                to={`/#project-${project.slug}`}
                 className="group inline-flex items-center gap-2 text-[0.8125rem] text-muted transition-colors duration-200 hover:text-fg"
               >
                 <Icon

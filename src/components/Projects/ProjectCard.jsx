@@ -27,12 +27,13 @@ export function FeaturedProjectCard({ project, index }) {
 
   return (
     <motion.article
+      id={`project-${project.slug}`}
       variants={staggerContainer(0.08)}
       initial="hidden"
       whileInView="visible"
       viewport={viewport}
       className={cn(
-        'group relative overflow-hidden rounded-panel border bg-surface transition-[border-color,box-shadow] duration-300',
+        'group relative scroll-mt-28 overflow-hidden rounded-panel border bg-surface transition-[border-color,box-shadow] duration-300',
         highlighted ? 'border-accent-line shadow-glow' : 'border-line hover:border-line-strong',
       )}
     >
@@ -188,9 +189,10 @@ export function ProjectCard({ project }) {
 
   return (
     <motion.article
+      id={`project-${project.slug}`}
       variants={staggerItem}
       className={cn(
-        'group flex h-full flex-col overflow-hidden rounded-panel border bg-surface transition-all duration-300 ease-out-quint',
+        'group flex h-full scroll-mt-28 flex-col overflow-hidden rounded-panel border bg-surface transition-all duration-300 ease-out-quint',
         highlighted
           ? 'border-accent-line shadow-glow'
           : 'border-line hover:-translate-y-0.5 hover:border-line-strong hover:shadow-lift',

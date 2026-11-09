@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 import { Seo } from '../components/ui/Seo.jsx'
 import { ErrorBoundary } from '../components/ui/ErrorBoundary.jsx'
@@ -33,14 +33,19 @@ import { scrollToSection } from '../utils/scroll.js'
  */
 export function HomePage() {
   const location = useLocation()
+  // Cross-page arrivals land instantly; same-page hash changes stay smooth.
+  const landedRef = useRef(false)
 
   // Arriving from a case study at /#skills should land on that section.
   useEffect(() => {
+    const instant = !landedRef.current
+    landedRef.current = true
     if (!location.hash) return
+
     const id = location.hash.slice(1)
 
     // One frame so the target section exists before we measure it.
-    const frame = requestAnimationFrame(() => scrollToSection(id, { updateHash: false }))
+    const frame = requestAnimationFrame(() => scrollToSection(id, { updateHash: false, instant }))
     return () => cancelAnimationFrame(frame)
   }, [location.hash])
 

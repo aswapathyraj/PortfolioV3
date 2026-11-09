@@ -10,15 +10,18 @@ const prefersReducedMotion = () =>
  * Relies on `scroll-padding-top` from the base stylesheet for the navbar
  * offset, so the value lives in one place. Returns false when the target is not
  * on the current page, letting the caller fall back to a route change.
+ *
+ * `instant` jumps without animating — used for cross-page deep links, where a
+ * smooth glide from the top of the home page reads as "wrong destination".
  */
-export function scrollToSection(id, { updateHash = true } = {}) {
+export function scrollToSection(id, { updateHash = true, instant = false } = {}) {
   if (typeof document === 'undefined') return false
 
   const element = document.getElementById(id)
   if (!element) return false
 
   element.scrollIntoView({
-    behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+    behavior: instant ? 'instant' : prefersReducedMotion() ? 'auto' : 'smooth',
     block: 'start',
   })
 

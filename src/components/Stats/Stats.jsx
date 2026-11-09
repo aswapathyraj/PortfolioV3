@@ -55,7 +55,6 @@ function StatValue({ stat, active }) {
         'block font-display leading-none tracking-tight text-fg',
         isNumber ? 'tnum text-3xl sm:text-[2.25rem]' : 'text-xl sm:text-2xl',
       )}
-      aria-label={isNumber ? `${stat.value} ${stat.label}` : undefined}
     >
       <span aria-hidden="true" className={cn(!active && isNumber && 'inline-block h-[1em] w-[2ch] animate-pulse rounded bg-elevated')}>
         {isNumber && !active ? '' : shown}

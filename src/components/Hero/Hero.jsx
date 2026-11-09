@@ -111,7 +111,12 @@ export function Hero() {
               <Button
                 size="lg"
                 iconRight="arrowRight"
-                onClick={() => scrollToSection('projects')}
+                href="#projects"
+                onClick={(event) => {
+                  if (event.button !== 0 || event.ctrlKey || event.metaKey || event.altKey) return
+                  event.preventDefault()
+                  scrollToSection('projects')
+                }}
                 className="w-full sm:w-auto"
               >
                 Explore My Work
@@ -120,7 +125,12 @@ export function Hero() {
                 size="lg"
                 variant="secondary"
                 icon="send"
-                onClick={() => scrollToSection('contact')}
+                href="#contact"
+                onClick={(event) => {
+                  if (event.button !== 0 || event.ctrlKey || event.metaKey || event.altKey) return
+                  event.preventDefault()
+                  scrollToSection('contact')
+                }}
                 className="w-full sm:w-auto"
               >
                 Let&rsquo;s Connect
@@ -161,6 +171,35 @@ export function Hero() {
                   {site.location}
                 </span>
               ) : null}
+            </motion.div>
+
+            {/* Recruiter path — the 30-second route through a 12-section page */}
+            <motion.div variants={fadeUp(14)} className="mt-8">
+              <p className="mono-label mb-3">Short on time? Start here</p>
+              <div className="flex flex-wrap items-center gap-2">
+                {[
+                  { id: 'projects', label: 'Projects' },
+                  { id: 'skills', label: 'Skills' },
+                  { id: 'experience', label: 'Experience' },
+                  { id: 'contact', label: 'Contact' },
+                ].map((item, index) => (
+                  <span key={item.id} className="inline-flex items-center gap-2">
+                    <a
+                      href={`#${item.id}`}
+                      onClick={(event) => {
+                        if (event.button !== 0 || event.ctrlKey || event.metaKey || event.altKey) return
+                        event.preventDefault()
+                        scrollToSection(item.id)
+                      }}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-surface/70 px-3 py-2 text-[0.8125rem] font-medium text-muted transition-colors duration-200 hover:border-line-strong hover:text-fg"
+                    >
+                      {item.label}
+                      <Icon name="arrowRight" className="size-3.5 text-subtle" />
+                    </a>
+                    {index < 3 ? <span aria-hidden="true" className="text-subtle">→</span> : null}
+                  </span>
+                ))}
+              </div>
             </motion.div>
           </motion.div>
 

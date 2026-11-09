@@ -96,6 +96,20 @@ export function FeaturedProjectCard({ project, index }) {
             {project.summary}
           </motion.p>
 
+          {/* Plain-language outcome — what this means for a non-technical reader */}
+          {project.outcome?.length ? (
+            <motion.p
+              variants={staggerItem}
+              className="mt-4 flex items-start gap-2 text-[0.8125rem] leading-relaxed text-muted"
+            >
+              <Icon name="trends" className="mt-0.5 size-4 shrink-0 text-accent" />
+              <span>
+                <span className="font-medium text-fg">Result: </span>
+                {project.outcome[0]}
+              </span>
+            </motion.p>
+          ) : null}
+
           {/* Headline features */}
           {project.features.length ? (
             <motion.ul variants={staggerItem} className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -163,58 +177,96 @@ export function FeaturedProjectCard({ project, index }) {
   )
 }
 
-/** Compact card for non-featured projects. */
+/** Compact card for non-featured projects. Consistent with FeaturedProjectCard:
+ *  title + visual link to the case study, separate Source / Live demo actions.
+ *  Deliberately NOT a whole-card <Link> — that pattern disagrees with the
+ *  featured layout and collapses the card's text into one giant link. */
 export function ProjectCard({ project }) {
   const { focusedSkill } = useSkillFocus()
   const highlighted = focusedSkill ? project.technologies.includes(focusedSkill.id) : false
   const stack = resolveSkillNames(project.technologies).slice(0, 4)
 
   return (
-    <motion.article variants={staggerItem} className="h-full">
+    <motion.article
+      variants={staggerItem}
+      className={cn(
+        'group flex h-full flex-col overflow-hidden rounded-panel border bg-surface transition-all duration-300 ease-out-quint',
+        highlighted
+          ? 'border-accent-line shadow-glow'
+          : 'border-line hover:-translate-y-0.5 hover:border-line-strong hover:shadow-lift',
+      )}
+    >
       <Link
         to={`/projects/${project.slug}`}
-        className={cn(
-          'group flex h-full flex-col overflow-hidden rounded-panel border bg-surface transition-all duration-300 ease-out-quint',
-          highlighted
-            ? 'border-accent-line shadow-glow'
-            : 'border-line hover:-translate-y-0.5 hover:border-line-strong hover:shadow-lift',
-        )}
+        aria-label={`Open the ${project.title} case study`}
+        className="block p-3.5 pb-0"
       >
-        <div className="p-3.5 pb-0">
+        <div className="overflow-hidden rounded-panel transition-transform duration-500 ease-out-quint group-hover:scale-[1.012]">
           <ProjectVisual project={project} aspect="aspect-[16/10]" />
         </div>
-
-        <div className="flex flex-1 flex-col p-4">
-          <div className="flex items-center gap-2">
-            <span className="mono-label">{project.category}</span>
-            {project.year ? <span className="mono-label">· {project.year}</span> : null}
-          </div>
-
-          <h3 className="mt-2 font-display text-lg text-fg transition-colors duration-200 group-hover:text-accent">
-            {project.title}
-          </h3>
-
-          <p className="mt-2 flex-1 text-[0.8125rem] leading-relaxed text-muted">
-            {project.summary}
-          </p>
-
-          <div className="mt-4 flex flex-wrap gap-1.5">
-            {stack.map((name) => (
-              <Tag key={name} tone={highlighted ? 'accent' : 'neutral'}>
-                {name}
-              </Tag>
-            ))}
-          </div>
-
-          <span className="mt-4 inline-flex items-center gap-1.5 text-[0.8125rem] font-medium text-accent">
-            Read case study
-            <Icon
-              name="arrowRight"
-              className="size-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
-            />
-          </span>
-        </div>
       </Link>
+
+      <div className="flex flex-1 flex-col p-4">
+        <div className="flex items-center gap-2">
+          <span className="mono-label">{project.category}</span>
+          {project.year ? <span className="mono-label">· {project.year}</span> : null}
+        </div>
+
+        <h3 className="mt-2 font-display text-lg">
+          <Link
+            to={`/projects/${project.slug}`}
+            className="text-fg transition-colors duration-200 hover:text-accent"
+          >
+            {project.title}
+          </Link>
+        </h3>
+
+        <p className="mt-2 flex-1 text-[0.8125rem] leading-relaxed text-muted">
+          {project.summary}
+        </p>
+
+        {project.outcome?.length ? (
+          <p className="mt-3 flex items-start gap-1.5 text-[0.75rem] leading-relaxed text-muted">
+            <Icon name="trends" className="mt-0.5 size-3.5 shrink-0 text-accent" />
+            <span>
+              <span className="font-medium text-fg">Result: </span>
+              {project.outcome[0]}
+            </span>
+          </p>
+        ) : null}
+
+        <div className="mt-4 flex flex-wrap gap-1.5">
+          {stack.map((name) => (
+            <Tag key={name} tone={highlighted ? 'accent' : 'neutral'}>
+              {name}
+            </Tag>
+          ))}
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-line pt-3.5">
+          <Button to={`/projects/${project.slug}`} size="sm" variant="ghost" iconRight="arrowRight" className="px-2 text-[0.8125rem]">
+            Read case study
+          </Button>
+          {project.liveDemo ? (
+            <a
+              href={project.liveDemo}
+              className="inline-flex items-center gap-1 px-2 py-1 text-[0.8125rem] text-muted transition-colors duration-200 hover:text-fg"
+            >
+              Live demo
+              <Icon name="arrowUpRight" className="size-3.5" />
+            </a>
+          ) : null}
+          {project.github ? (
+            <a
+              href={project.github}
+              className="inline-flex items-center gap-1 px-2 py-1 text-[0.8125rem] text-muted transition-colors duration-200 hover:text-fg"
+            >
+              Source
+              <Icon name="arrowUpRight" className="size-3.5" />
+            </a>
+          ) : null}
+        </div>
+      </div>
     </motion.article>
   )
 }

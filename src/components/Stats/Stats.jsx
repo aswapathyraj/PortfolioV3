@@ -10,14 +10,17 @@ import { viewportEager } from '../../animations/transitions.js'
  * Counts up to a target when scrolled into view.
  *
  * Skipped entirely under reduced motion — a number that animates is decoration,
- * and the value is the point.
+ * and the value is the point. Until the strip is in view the value is held at
+ * `null` (rendered as a skeleton), so a visitor never sees a brief "0" that
+ * reads as real data before the final figure lands.
  */
 function useCountUp(target, active, duration = 900) {
   const prefersReducedMotion = useReducedMotion()
-  const [value, setValue] = useState(prefersReducedMotion ? target : 0)
+  const [value, setValue] = useState(null)
 
   useEffect(() => {
-    if (prefersReducedMotion || !active) {
+    if (!active) return
+    if (prefersReducedMotion) {
       setValue(target)
       return
     }
@@ -44,6 +47,7 @@ function useCountUp(target, active, duration = 900) {
 function StatValue({ stat, active }) {
   const isNumber = stat.kind === 'number' && Number.isFinite(Number(stat.value))
   const counted = useCountUp(isNumber ? Number(stat.value) : 0, active)
+  const shown = isNumber ? counted : stat.value
 
   return (
     <span
@@ -51,8 +55,14 @@ function StatValue({ stat, active }) {
         'block font-display leading-none tracking-tight text-fg',
         isNumber ? 'tnum text-3xl sm:text-[2.25rem]' : 'text-xl sm:text-2xl',
       )}
+      aria-label={isNumber ? `${stat.value} ${stat.label}` : undefined}
     >
-      {isNumber ? counted : stat.value}
+      <span aria-hidden="true" className={cn(!active && isNumber && 'inline-block h-[1em] w-[2ch] animate-pulse rounded bg-elevated')}>
+        {isNumber && !active ? '' : shown}
+      </span>
+      {isNumber && !active ? (
+        <span className="sr-only">{stat.value}</span>
+      ) : null}
     </span>
   )
 }

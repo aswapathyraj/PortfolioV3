@@ -8,6 +8,7 @@ import { Cursor } from './components/Cursor/Cursor.jsx'
 import { ScrollProgress } from './components/ui/ScrollProgress.jsx'
 import { ErrorBoundary } from './components/ui/ErrorBoundary.jsx'
 import { Icon } from './components/ui/Icon.jsx'
+import { StickyCta } from './components/ui/StickyCta.jsx'
 import { HomePage } from './pages/HomePage.jsx'
 import { page } from './animations/variants.js'
 import { missingConfigKeys } from './config.js'
@@ -139,6 +140,7 @@ export default function App() {
           <AnimatedRoutes />
         </ErrorBoundary>
 
+        <StickyCta />
         <Footer />
       </MotionConfig>
     </ThemeProvider>

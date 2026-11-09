@@ -112,9 +112,10 @@ export function Contact() {
 
           <p className="flex items-start gap-2 rounded-inset border border-line bg-sunken px-3.5 py-3 text-[0.75rem] leading-relaxed text-subtle">
             <Icon name="info" className="mt-0.5 size-3.5 shrink-0" />
-            The form validates your message client-side and server-side using the same module. Where
-            it goes next depends on which provider is configured
-            {deliveryConfigured ? ' — right now it sends through the configured service.' : ' — right now, nothing is sent silently.'}
+            The form validates your message client-side and server-side using the same module.
+            {deliveryConfigured
+              ? ' When you submit, it sends through the configured service. I read every message — expect a reply within a couple of days.'
+              : ` No delivery service is connected yet, so submitting won't send automatically. Use "Send it by email instead" to email ${email || 'me'} directly.`}
           </p>
         </Reveal>
       </div>

@@ -1,4 +1,5 @@
 import { useRef } from 'react'
+import { useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { navLinks, engineeringSubLinks } from '../../data/navigation.js'
 import { isConfigured } from '../../config.js'
@@ -28,6 +29,20 @@ export function MobileMenu({ activeSection, onNavigate, onClose }) {
   const { site } = useSite()
   const { availability } = site
   const socials = socialLinks().filter((item) => item.configured)
+  const { pathname } = useLocation()
+  const isHome = pathname === '/'
+
+  const sectionHref = (id) => {
+    if (id === 'home') return isHome ? '#home' : '/'
+    return isHome ? `#${id}` : `/#${id}`
+  }
+
+  const handleNavClick = (event, id) => {
+    // Modified / middle clicks open in a new tab via the native href.
+    if (event.button !== 0 || event.ctrlKey || event.metaKey || event.altKey) return
+    event.preventDefault()
+    onNavigate(id)
+  }
 
   return (
     <motion.div
@@ -69,9 +84,9 @@ export function MobileMenu({ activeSection, onNavigate, onClose }) {
               const active = activeSection === link.id
               return (
                 <motion.li key={link.id} variants={staggerItem}>
-                  <button
-                    type="button"
-                    onClick={() => onNavigate(link.id)}
+                  <a
+                    href={sectionHref(link.id)}
+                    onClick={(event) => handleNavClick(event, link.id)}
                     aria-current={active ? 'true' : undefined}
                     data-autofocus={index === 0 ? '' : undefined}
                     className={cn(
@@ -90,7 +105,7 @@ export function MobileMenu({ activeSection, onNavigate, onClose }) {
                     ) : (
                       <Icon name="chevronRight" className="size-4 text-subtle" />
                     )}
-                  </button>
+                  </a>
                 </motion.li>
               )
             })}
@@ -102,13 +117,13 @@ export function MobileMenu({ activeSection, onNavigate, onClose }) {
             <ul className="grid grid-cols-2 gap-1.5">
               {engineeringSubLinks.map((link) => (
                 <li key={link.id}>
-                  <button
-                    type="button"
-                    onClick={() => onNavigate(link.id)}
-                    className="w-full rounded-md border border-line bg-sunken px-2.5 py-2 text-left text-[0.75rem] text-muted transition-colors duration-200 active:border-line-strong active:text-fg"
+                  <a
+                    href={sectionHref(link.id)}
+                    onClick={(event) => handleNavClick(event, link.id)}
+                    className="block w-full rounded-md border border-line bg-sunken px-2.5 py-2 text-left text-[0.75rem] text-muted transition-colors duration-200 active:border-line-strong active:text-fg"
                   >
                     {link.label}
-                  </button>
+                  </a>
                 </li>
               ))}
             </ul>

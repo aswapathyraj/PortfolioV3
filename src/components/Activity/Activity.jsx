@@ -271,13 +271,13 @@ export function Activity() {
             )}
           </div>
 
-          <div className="rounded-panel border border-line bg-surface p-4">
-            <p className="mono-label mb-3.5 flex items-center gap-1.5">
-              <Icon name="commit" className="size-3" />
-              Recent public commits
-            </p>
+          {commits.length ? (
+            <div className="rounded-panel border border-line bg-surface p-4">
+              <p className="mono-label mb-3.5 flex items-center gap-1.5">
+                <Icon name="commit" className="size-3" />
+                Recent public commits
+              </p>
 
-            {commits.length ? (
               <ul className="flex flex-col gap-3">
                 {commits.map((commit, index) => (
                   <li key={`${commit.sha}-${index}`} className="flex gap-2.5">
@@ -295,13 +295,8 @@ export function Activity() {
                   </li>
                 ))}
               </ul>
-            ) : (
-              <p className="text-[0.8125rem] leading-relaxed text-subtle">
-                No public push events in the window GitHub returns. The events endpoint only covers
-                recent activity, so a quiet week shows as empty rather than as zero.
-              </p>
-            )}
-          </div>
+            </div>
+          ) : null}
 
           <p className="flex items-start gap-2 rounded-inset border border-line bg-sunken px-3.5 py-3 text-[0.75rem] leading-relaxed text-subtle">
             <Icon name="info" className="mt-0.5 size-3.5 shrink-0" />

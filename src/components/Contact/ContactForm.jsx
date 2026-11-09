@@ -98,8 +98,8 @@ export function ContactForm() {
       setState('fallback')
       setStatusMessage(
         provider === 'none'
-          ? 'Your message is valid, but no delivery service is connected to this form yet — so nothing was sent.'
-          : 'Your message is valid, but this form is not finished being set up — so nothing was sent.',
+          ? `Your message is valid, but this form isn't connected to a delivery service yet — nothing was sent automatically. Use "Send it by email instead" to email ${email || 'me'} directly, or send to ${email || 'the address shown above'}.`
+          : 'Your message is valid, but this form is not finished being set up — so nothing was sent automatically. Use "Send it by email instead" as a fallback.',
       )
       return
     }
@@ -185,6 +185,7 @@ export function ContactForm() {
           submission that arrives with this ticked. */}
       <input
         ref={botcheckRef}
+        id="contact-botcheck"
         type="checkbox"
         name="botcheck"
         tabIndex={-1}
@@ -200,6 +201,7 @@ export function ContactForm() {
             </label>
             <input
               id={`contact-${field.name}`}
+              name={field.name}
               ref={(element) => {
                 fieldRefs.current[field.name] = element
               }}
@@ -238,6 +240,7 @@ export function ContactForm() {
         </label>
         <input
           id="contact-subject"
+          name="subject"
           ref={(element) => {
             fieldRefs.current.subject = element
           }}
@@ -246,6 +249,7 @@ export function ContactForm() {
           onChange={(event) => setValue('subject', event.target.value)}
           onBlur={() => handleBlur('subject')}
           placeholder="What is this about?"
+          autoComplete="off"
           aria-invalid={Boolean(errors.subject && touched.subject)}
           aria-describedby={errors.subject && touched.subject ? 'contact-subject-error' : undefined}
           className={inputClasses('subject')}
@@ -283,6 +287,7 @@ export function ContactForm() {
         </div>
         <textarea
           id="contact-message"
+          name="message"
           ref={(element) => {
             fieldRefs.current.message = element
           }}
@@ -315,6 +320,8 @@ export function ContactForm() {
       <div className="flex flex-wrap items-center gap-3">
         <Button
           as="button"
+          id="contact-submit"
+          name="submit"
           type="submit"
           size="lg"
           disabled={state === 'submitting'}

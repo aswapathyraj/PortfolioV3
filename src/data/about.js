@@ -6,7 +6,6 @@
 export const aboutIntro = [
   'I build complete web applications — the interface, the API behind it, the schema underneath, and the deployment that puts it in front of someone. Most of what I have shipped covers all four layers, because that is where the interesting problems are: the gap between a screen that looks right and a system that behaves correctly.',
   'My two main projects were chosen for what they force you to solve rather than what they look like. An art platform with auctions makes you take server-side validation and transactions seriously, because a bid that is accepted twice is a broken product. A restaurant ordering system with no login makes you separate identity from authentication, and then work out how to scope data without one.',
-  'I work from the data outward. Getting the schema right first tends to make the API shape obvious, and a clear API makes the frontend state manageable. When I get that order wrong, I feel it later — usually as a component holding state the server should have owned.',
 ]
 
 export const focusAreas = [

@@ -34,8 +34,10 @@ export function Logo({ compact = false, className }) {
         leave the wordmark clipped to invisibility on desktop.
       */}
       <span className={cn('flex flex-col leading-none', compact && 'sr-only sm:not-sr-only sm:flex')}>
+        {/* Explicit space so the wordmark's accessible name reads "Name TITLE"
+            rather than a fused string. */}
         <span className="font-display text-[0.9375rem] font-semibold tracking-tight text-fg">
-          {site.name}
+          {site.name}{' '}
         </span>
         <span className="mt-1 font-mono text-[0.625rem] tracking-[0.12em] text-subtle">
           {site.title.toUpperCase()}

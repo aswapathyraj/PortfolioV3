@@ -17,7 +17,7 @@ export function Resume() {
   const isExternal = configured && /^https?:/i.test(siteConfig.resume)
 
   return (
-    <section aria-labelledby="resume-heading" className="py-8 sm:py-12">
+    <section id="resume" aria-labelledby="resume-heading" className="py-8 sm:py-12">
       <Container>
         <Reveal>
           <div className="relative overflow-hidden rounded-panel border border-line bg-surface">

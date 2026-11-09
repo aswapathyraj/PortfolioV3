@@ -1,5 +1,29 @@
 @import 'tailwindcss';
 
+/* Self-hosted variable fonts (latin subset). Replaces the render-blocking
+   Google Fonts stylesheet; files live in public/fonts/. */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/inter-latin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url('/fonts/space-grotesk-latin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url('/fonts/jetbrains-mono-latin.woff2') format('woff2');
+}
+
 /* ---------------------------------------------------------------------------
    Design tokens
    ---------------------------------------------------------------------------
@@ -63,7 +87,9 @@
 
   --p-fg: #e9ecef;
   --p-muted: #9aa1a9;
-  --p-subtle: #6b737b;
+  /* WCAG AA (4.5:1+) on #08090A — was #6b737b at 4.07:1. Kept in step with
+     --p-muted so mono-labels, captions and text-subtle all pass. */
+  --p-subtle: #9aa3ab;
 
   --p-accent: #00e5a0;
   --p-accent-hover: #34f0b4;
@@ -99,7 +125,8 @@
 
   --p-fg: #14171a;
   --p-muted: #565e68;
-  --p-subtle: #7a828c;
+  /* WCAG AA (4.5:1+) on #ffffff — was #7a828c at ~3.9:1. */
+  --p-subtle: #5a646e;
 
   --p-accent: #00875a;
   --p-accent-hover: #016c48;

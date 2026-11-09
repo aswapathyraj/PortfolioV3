@@ -43,7 +43,7 @@ export const siteConfig = {
 
   // ---- Deployment --------------------------------------------------------
   /** Canonical origin, no trailing slash. Used for SEO tags + sitemap. */
-  siteUrl: 'https://portfolio-mauve-chi-wy3914jh09.vercel.app',
+  siteUrl: 'https://portfolio-v2-weld-five.vercel.app',
 
   // ---- SEO ---------------------------------------------------------------
   seo: {
@@ -60,7 +60,7 @@ export const siteConfig = {
       'SQLite',
       'Tailwind CSS',
     ],
-    ogImage: '/og-image.svg',
+    ogImage: '/og-image.png',
     twitterHandle: '',
   },
 

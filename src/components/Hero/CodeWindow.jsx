@@ -91,7 +91,7 @@ function Line({ text, lineNumber, showCursor }) {
 
   return (
     <div className="flex gap-3.5 sm:gap-4">
-      <span aria-hidden="true" className="w-4 shrink-0 select-none text-right text-subtle/60 tabular-nums">
+      <span aria-hidden="true" className="w-4 shrink-0 select-none text-right text-subtle tabular-nums">
         {lineNumber}
       </span>
       <span className="min-w-0 break-all">

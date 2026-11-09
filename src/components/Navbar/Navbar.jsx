@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { navLinks, sectionIds } from '../../data/navigation.js'
-import { useSite } from '../../lib/usePublicData.js'
 import { cn } from '../../utils/cn.js'
 import { scrollToSection } from '../../utils/scroll.js'
 import { useActiveSection } from '../../hooks/useActiveSection.js'
@@ -26,7 +25,6 @@ export function Navbar() {
   const location = useLocation()
   const navigate = useNavigate()
   const isHome = location.pathname === '/'
-  const { site } = useSite()
 
   const scrolled = useScrolledPast(24)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -48,6 +46,21 @@ export function Navbar() {
     },
     [isHome, navigate],
   )
+
+  // Real <a> links so middle-click, copy-link and back work; same-page
+  // scrolling still intercepts plain clicks (modifier / middle clicks fall
+  // through to the browser so they open in a new tab with the #hash).
+  const sectionHref = (id) => {
+    if (id === 'home') return isHome ? '#home' : '/'
+    return isHome ? `#${id}` : `/#${id}`
+  }
+
+  const handleNavClick = (event, id) => {
+    // Let modified / middle clicks open a new tab — that IS the point of <a>.
+    if (event.button !== 0 || event.ctrlKey || event.metaKey || event.altKey) return
+    event.preventDefault()
+    goToSection(id)
+  }
 
   return (
     <>
@@ -82,14 +95,14 @@ export function Navbar() {
             style={{ bottom: scrolled ? '0.5rem' : '0.75rem' }}
           />
 
-          <button
-            type="button"
-            onClick={() => goToSection('home')}
-            aria-label={`${site.name} — back to top`}
+          <a
+            href={sectionHref('home')}
+            onClick={(event) => handleNavClick(event, 'home')}
+            title="Back to top"
             className="shrink-0 rounded-lg py-1 text-left"
           >
             <Logo compact />
-          </button>
+          </a>
 
           {/* Desktop links */}
           <nav aria-label="Primary" className="hidden lg:block">
@@ -98,12 +111,12 @@ export function Navbar() {
                 const active = isHome && activeSection === link.id
                 return (
                   <li key={link.id}>
-                    <button
-                      type="button"
-                      onClick={() => goToSection(link.id)}
+                    <a
+                      href={sectionHref(link.id)}
+                      onClick={(event) => handleNavClick(event, link.id)}
                       aria-current={active ? 'true' : undefined}
                       className={cn(
-                        'relative rounded-lg px-3 py-2 text-[0.8125rem] font-medium transition-colors duration-200',
+                        'relative inline-block rounded-lg px-3 py-2 text-[0.8125rem] font-medium transition-colors duration-200',
                         active ? 'text-fg' : 'text-muted hover:text-fg',
                       )}
                     >
@@ -115,7 +128,7 @@ export function Navbar() {
                         />
                       ) : null}
                       {link.label}
-                    </button>
+                    </a>
                   </li>
                 )
               })}
@@ -127,7 +140,7 @@ export function Navbar() {
             <SocialIconRow className="hidden sm:flex" />
             <ThemeToggle />
             <span aria-hidden="true" className="mx-1 hidden h-5 w-px bg-line sm:block" />
-            <ResumeButton size="sm" variant="secondary" className="hidden sm:inline-flex" />
+            <ResumeButton size="sm" variant="primary" className="hidden sm:inline-flex" />
 
             <IconButton
               label={menuOpen ? 'Close menu' : 'Open menu'}

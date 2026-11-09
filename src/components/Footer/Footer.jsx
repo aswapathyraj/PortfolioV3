@@ -20,8 +20,19 @@ export function Footer() {
     navigate(id === 'home' ? '/' : `/#${id}`)
   }
 
+  const sectionHref = (id) => {
+    if (id === 'home') return isHome ? '#home' : '/'
+    return isHome ? `#${id}` : `/#${id}`
+  }
+
+  const handleNavClick = (event, id) => {
+    if (event.button !== 0 || event.ctrlKey || event.metaKey || event.altKey) return
+    event.preventDefault()
+    go(id)
+  }
+
   return (
-    <footer className="relative border-t border-line bg-surface/40">
+    <footer className="relative border-t border-line bg-surface/40 pb-24 lg:pb-0">
       <div
         aria-hidden="true"
         className="grid-field pointer-events-none absolute inset-0 opacity-40 [mask-image:linear-gradient(to_bottom,black,transparent_60%)]"
@@ -46,13 +57,13 @@ export function Footer() {
             <ul className="flex flex-col gap-2.5">
               {navLinks.map((link) => (
                 <li key={link.id}>
-                  <button
-                    type="button"
-                    onClick={() => go(link.id)}
-                    className="text-left text-sm text-muted transition-colors duration-200 hover:text-fg"
+                  <a
+                    href={sectionHref(link.id)}
+                    onClick={(event) => handleNavClick(event, link.id)}
+                    className="inline-block text-left text-sm text-muted transition-colors duration-200 hover:text-fg"
                   >
                     {link.label}
-                  </button>
+                  </a>
                 </li>
               ))}
             </ul>
@@ -64,13 +75,13 @@ export function Footer() {
             <ul className="flex flex-col gap-2.5">
               {engineeringSubLinks.map((link) => (
                 <li key={link.id}>
-                  <button
-                    type="button"
-                    onClick={() => go(link.id)}
-                    className="text-left text-sm text-muted transition-colors duration-200 hover:text-fg"
+                  <a
+                    href={sectionHref(link.id)}
+                    onClick={(event) => handleNavClick(event, link.id)}
+                    className="inline-block text-left text-sm text-muted transition-colors duration-200 hover:text-fg"
                   >
                     {link.label}
-                  </button>
+                  </a>
                 </li>
               ))}
             </ul>
@@ -97,14 +108,19 @@ export function Footer() {
           </p>
 
           <div className="flex items-center gap-5">
-            <span className="mono-label flex items-center gap-1.5 text-subtle/70">
+            <span className="mono-label flex items-center gap-1.5">
               <Icon name="react" className="size-3" />
               Built with React
             </span>
 
-            <button
-              type="button"
-              onClick={scrollToTop}
+            <a
+              href={sectionHref('home')}
+              onClick={(event) => {
+                if (event.button !== 0 || event.ctrlKey || event.metaKey || event.altKey) return
+                event.preventDefault()
+                if (isHome) scrollToTop()
+                else navigate('/')
+              }}
               className="group inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-[0.78125rem] text-muted transition-colors duration-200 hover:text-fg"
             >
               Back to top
@@ -112,7 +128,7 @@ export function Footer() {
                 name="arrowUpRight"
                 className="size-3 transition-transform duration-200 group-hover:-translate-y-0.5"
               />
-            </button>
+            </a>
           </div>
         </div>
       </Container>

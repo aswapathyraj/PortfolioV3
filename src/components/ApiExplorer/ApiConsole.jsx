@@ -136,6 +136,8 @@ export function ApiConsole({ endpoint }) {
                 <Field key={param.name} label={`Path · ${param.name}`} hint={param.note}>
                   <input
                     type="text"
+                    id={`api-param-${param.name}`}
+                    name={`param-${param.name}`}
                     value={paramValues[param.name] ?? ''}
                     onChange={(event) =>
                       setParamValues((current) => ({ ...current, [param.name]: event.target.value }))
@@ -155,6 +157,8 @@ export function ApiConsole({ endpoint }) {
                 <Field key={param.name} label={`Query · ${param.name}`} hint={param.note}>
                   <input
                     type="text"
+                    id={`api-query-${param.name}`}
+                    name={`query-${param.name}`}
                     value={queryValues[param.name] ?? ''}
                     onChange={(event) =>
                       setQueryValues((current) => ({ ...current, [param.name]: event.target.value }))
@@ -172,6 +176,8 @@ export function ApiConsole({ endpoint }) {
             <div className="mt-4">
               <Field label="Request body · JSON">
                 <textarea
+                  id="api-body"
+                  name="body"
                   value={bodyText}
                   onChange={(event) => setBodyText(event.target.value)}
                   rows={9}

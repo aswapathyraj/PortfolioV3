@@ -30,7 +30,9 @@
       property="og:description"
       content="Portfolio of Aswapathy Raj, a full-stack developer building modern web applications with React, Node.js, APIs, and databases."
     />
-    <meta property="og:image" content="/og-image.svg" />
+    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Aswapathy Raj — Full-Stack Developer" />
 
     <meta name="twitter:card" content="summary_large_image" />
@@ -39,17 +41,34 @@
       name="twitter:description"
       content="Portfolio of Aswapathy Raj, a full-stack developer building modern web applications with React, Node.js, APIs, and databases."
     />
-    <meta name="twitter:image" content="/og-image.svg" />
+    <meta name="twitter:image" content="/og-image.png" />
+    <meta name="twitter:image:alt" content="Aswapathy Raj — Full-Stack Developer" />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
     <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="ard" href="/.well-known/ard.json" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/inter-latin.woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/space-grotesk-latin.woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/jetbrains-mono-latin.woff2"
+      crossorigin
     />
 
     <script type="application/ld+json">
@@ -77,8 +96,23 @@
   <body>
     <div id="root"></div>
     <noscript>
-      This portfolio uses React for its interactive sections. Please enable
-      JavaScript, or reach out directly by email.
+      <div style="padding: 2rem; max-width: 36rem; margin: 0 auto; font-family: system-ui, sans-serif; line-height: 1.6">
+        <h1>Aswapathy Raj — Full-Stack Developer</h1>
+        <p>
+          I build modern, scalable web applications from interface to database and deployment,
+          using React, Node.js, REST APIs, and SQLite.
+        </p>
+        <p>
+          <a href="mailto:aswapathyraj@gmail.com">aswapathyraj@gmail.com</a> ·
+          <a href="https://github.com/aswapathyraj">GitHub</a> ·
+          <a href="/resume.pdf">Resume (PDF)</a>
+        </p>
+        <p>
+          This portfolio uses React for its interactive sections (case studies, API explorer,
+          architecture diagrams). Please enable JavaScript for the full experience, or reach
+          out directly by email.
+        </p>
+      </div>
     </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>

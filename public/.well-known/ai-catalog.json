@@ -1,0 +1,19 @@
+{
+  "specVersion": "1.0",
+  "entries": [
+    {
+      "identifier": "urn:air:portfolio-v2-weld-five.vercel.app:portfolio",
+      "displayName": "Aswapathy Raj - Full-Stack Developer Portfolio",
+      "type": "text/markdown; profile=\"urn:air:agent-skills\"",
+      "url": "https://portfolio-v2-weld-five.vercel.app/llms.txt",
+      "description": "Machine-readable overview of this portfolio maintained per the llms.txt proposal (llmstxt.org): the projects, the stack, and the case-study URLs. Static document; no agent is exposed.",
+      "tags": ["portfolio", "react", "full-stack", "node.js", "sqlite"],
+      "representativeQueries": [
+        "what does Aswapathy Raj build",
+        "show me Aswapathy Raj's full-stack case studies",
+        "who is Aswapathy Raj"
+      ],
+      "updatedAt": "2026-11-08T00:00:00Z"
+    }
+  ]
+}

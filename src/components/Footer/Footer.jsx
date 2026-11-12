@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { isConfigured } from '../../config.js'
 import { navLinks, engineeringSubLinks } from '../../data/navigation.js'
 import { useSite } from '../../lib/usePublicData.js'
@@ -84,6 +84,12 @@ export function Footer() {
                   </a>
                 </li>
               ))}
+              <li className="border-t border-line/60 pt-2.5">
+                <Link to="/projects" className="inline-flex items-center gap-1.5 text-sm transition-colors duration-200 hover:text-accent">
+                  All projects
+                  <Icon name="arrowRight" className="size-3.5" />
+                </Link>
+              </li>
             </ul>
           </nav>
 

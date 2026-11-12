@@ -22,6 +22,7 @@ const today = new Date().toISOString().slice(0, 10)
 
 const routes = [
   { path: '/', priority: '1.0', changefreq: 'monthly' },
+  { path: '/projects', priority: '0.9', changefreq: 'monthly' },
   ...projects
     .filter((project) => project.status !== 'placeholder')
     .map((project) => ({

@@ -19,6 +19,9 @@ import { usePublicData } from './lib/usePublicData.js'
  * Case studies are route-split: the home page's first paint does not pay for a
  * page most visitors reach second, if at all.
  */
+const AllProjectsPage = lazy(() =>
+  import('./pages/AllProjectsPage.jsx').then((module) => ({ default: module.AllProjectsPage })),
+)
 const ProjectDetailPage = lazy(() =>
   import('./pages/ProjectDetailPage.jsx').then((module) => ({ default: module.ProjectDetailPage })),
 )
@@ -78,6 +81,7 @@ function AnimatedRoutes() {
         <Suspense fallback={<RouteFallback />}>
           <Routes location={location}>
             <Route path="/" element={<HomePage />} />
+            <Route path="/projects" element={<AllProjectsPage />} />
             <Route path="/projects/:slug" element={<ProjectDetailPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>

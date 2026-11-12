@@ -62,7 +62,7 @@ export function Activity() {
 
   const header = (
     <SectionHeader
-      index="09"
+      index="10"
       eyebrow="Developer Activity"
       title="Public GitHub, live."
       description="Pulled straight from the public GitHub API when the page loads — repositories, languages, and recent pushes. Nothing here is hand-written, which also means it is subject to GitHub's unauthenticated rate limit."

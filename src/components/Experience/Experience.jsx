@@ -31,7 +31,7 @@ export function Experience() {
   return (
     <Section id="experience">
       <SectionHeader
-        index="10"
+        index="11"
         eyebrow="Experience"
         title="What I have actually built."
         description={experienceNote}

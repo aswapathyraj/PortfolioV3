@@ -32,7 +32,7 @@ export function Engineering() {
   return (
     <Section id="engineering">
       <SectionHeader
-        index="04"
+        index="05"
         eyebrow="Engineering"
         title="How I Build"
         description="The path from an idea to something deployed. Select a step to see what happens there, what it is built with, why it matters, and where it showed up in real work."

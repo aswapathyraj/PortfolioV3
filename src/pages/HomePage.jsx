@@ -8,6 +8,7 @@ import { Stats } from '../components/Stats/Stats.jsx'
 import { About } from '../components/About/About.jsx'
 import { Skills } from '../components/Skills/Skills.jsx'
 import { Projects } from '../components/Projects/Projects.jsx'
+import { Studio } from '../components/Studio/Studio.jsx'
 import { Engineering } from '../components/Engineering/Engineering.jsx'
 import { Architecture } from '../components/Architecture/Architecture.jsx'
 import { Database } from '../components/Database/Database.jsx'
@@ -92,6 +93,7 @@ export function HomePage() {
     { key: 'about', node: <About /> },
     { key: 'skills', node: <Skills /> },
     { key: 'projects', node: <Projects /> },
+    { key: 'studio', node: <Studio /> },
     { key: 'engineering', node: <Engineering /> },
     { key: 'architecture', node: <Architecture /> },
     { key: 'database', node: <Database /> },

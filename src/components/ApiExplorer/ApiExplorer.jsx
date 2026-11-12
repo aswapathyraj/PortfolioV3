@@ -32,7 +32,7 @@ export function ApiExplorer() {
   return (
     <Section id="api">
       <SectionHeader
-        index="08"
+        index="09"
         eyebrow="API Explorer"
         title="The API layer, inspectable."
         description="Edit the request and run it. Responses are generated in the browser from this site's own data layer — the payloads and status codes are real, the network call is not."

@@ -64,7 +64,7 @@ export function Contact() {
   return (
     <Section id="contact" className="pb-24 sm:pb-28">
       <SectionHeader
-        index="12"
+        index="13"
         eyebrow="Contact"
         title="Let's Build Something."
         description="I'm open to interesting projects, collaborations, internships, freelance work, and software development roles."

@@ -159,7 +159,7 @@ export function Security() {
   return (
     <Section id="security">
       <SectionHeader
-        index="07"
+        index="08"
         eyebrow="Security"
         title="Security By Design"
         description="Split honestly between what is running in these projects and what I understand but have not shipped. Expand any control for the reasoning behind it."

@@ -8,6 +8,7 @@ export const navSections = [
   { id: 'about', label: 'About', inNav: true },
   { id: 'skills', label: 'Skills', inNav: true },
   { id: 'projects', label: 'Projects', inNav: true },
+  { id: 'studio', label: 'Studio', inNav: true },
   { id: 'engineering', label: 'Engineering', inNav: true },
   { id: 'architecture', label: 'Architecture', inNav: false },
   { id: 'database', label: 'Database', inNav: false },

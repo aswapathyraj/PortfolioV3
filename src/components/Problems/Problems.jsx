@@ -20,7 +20,7 @@ export function Problems() {
   return (
     <Section id="problems">
       <SectionHeader
-        index="11"
+        index="12"
         eyebrow="Problem Solving"
         title="Problems I Like Solving"
         description="The recurring ones. Expand any card for the concrete version and where it came up."

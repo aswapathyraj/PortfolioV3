@@ -57,7 +57,7 @@ export function Database() {
   if (withSchema.length === 0) {
     return (
       <Section id="database">
-        <SectionHeader index="06" eyebrow="Database" title="Database Design" />
+        <SectionHeader index="07" eyebrow="Database" title="Database Design" />
         <EmptyState
           icon="database"
           title="No schemas documented yet"
@@ -78,7 +78,7 @@ export function Database() {
   return (
     <Section id="database">
       <SectionHeader
-        index="06"
+        index="07"
         eyebrow="Database Design"
         title="Schemas, not just tables."
         description="Select a table to see what it relates to. These are design illustrations of real project schemas — simplified types, no data, no credentials."

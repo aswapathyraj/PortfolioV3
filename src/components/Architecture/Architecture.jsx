@@ -24,7 +24,7 @@ export function Architecture() {
   return (
     <Section id="architecture">
       <SectionHeader
-        index="05"
+        index="06"
         eyebrow="System Architecture"
         title="Every box has a job it owns."
         description="The shape both full-stack projects share. Select a layer to see its responsibility, what it is built with, and the failure mode when that boundary is not respected."

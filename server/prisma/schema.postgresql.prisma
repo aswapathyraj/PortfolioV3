@@ -1,0 +1,327 @@
+// Portfolio Control Center — database schema.
+//
+// The schema is kept portable between SQLite and PostgreSQL. During local
+// development `provider = "postgresql"` gives zero-setup persistence
+// (`DATABASE_URL="file:./dev.db"`). For production the source of truth is
+// PostgreSQL: change the provider line to `"postgresql"` and point
+// DATABASE_URL at your instance — every model below is standard SQL.
+//
+// Keep the two in mind while editing: no Prisma enums (SQLite has none), avoid
+// native column types not shared by both, and keep @db.* annotations out.
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.x"]
+}
+
+datasource db {
+  // Production: provider = "postgresql"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Identity & sessions
+// ---------------------------------------------------------------------------
+
+model Admin {
+  id           String        @id @default(cuid())
+  name         String
+  email        String        @unique
+  passwordHash String
+  role         String        @default("editor") // owner | admin | editor
+  avatarUrl    String?
+  lastLoginAt  DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  sessions     Session[]
+  activityLogs ActivityLog[]
+}
+
+model Session {
+  id        String    @id @default(cuid())
+  admin     Admin     @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  adminId   String
+  tokenHash String    @unique
+  userAgent String?
+  ip        String?
+  device    String?
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([adminId])
+}
+
+// ---------------------------------------------------------------------------
+// Projects & content
+// ---------------------------------------------------------------------------
+
+model Project {
+  id           String           @id @default(cuid())
+  slug         String           @unique
+  title        String
+  subtitle     String?
+  category     String? // Full-stack application | Frontend engineering | …
+  year         String?
+  status       String           @default("draft") // draft | published | archived
+  featured     Boolean          @default(false)
+  accent       String?
+  image        String?
+  summary      String?
+  description  String?
+  problem      String?
+  solution     String?
+  features     String? // JSON [{ title, detail }]
+  architecture String? // JSON { note, rows: Node[][] }
+  database     String? // JSON { note, tables: [...] }
+  auth         String? // JSON [{ label, detail }]
+  challenges   String? // JSON [{ title, detail }]
+  learnings    String? // JSON string[]
+  outcome      String? // JSON string[]
+  caseSections String? // JSON structured richtext
+  github       String?
+  liveDemo     String?
+  seo          String? // JSON { seoTitle, metaDescription, ogImage, canonical }
+  publishedAt  DateTime?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  screenshots  Screenshot[]
+  technologies ProjectSkill[]
+  versions     ProjectVersion[]
+
+  @@index([status])
+  @@index([featured])
+  @@index([createdAt])
+}
+
+model ProjectVersion {
+  id         String   @id @default(cuid())
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId  String
+  version    Int
+  note       String?
+  status     String   @default("draft") // snapshot of the project status
+  payload    String?    // JSON full project snapshot
+  createdById String?
+  createdAt  DateTime @default(now())
+
+  @@unique([projectId, version])
+  @@index([projectId, createdAt])
+}
+
+model Screenshot {
+  id          String   @id @default(cuid())
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId   String
+  url         String
+  caption     String?
+  alt         String?
+  isFeatured  Boolean  @default(false)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  @@index([projectId])
+}
+
+model ProjectSkill {
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  skill     Skill   @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  projectId String
+  skillId   String
+  sortOrder Int     @default(0)
+
+  @@id([projectId, skillId])
+  @@index([skillId])
+}
+
+// ---------------------------------------------------------------------------
+// Skills
+// ---------------------------------------------------------------------------
+
+model Skill {
+  id          String         @id
+  name        String
+  category    String         @default("other") // frontend | backend | database | security | tools | other
+  icon        String?
+  description String?
+  proficiency Int?
+  featured    Boolean        @default(false)
+  sortOrder   Int            @default(0)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  projects    ProjectSkill[]
+
+  @@index([category])
+}
+
+// ---------------------------------------------------------------------------
+// Experience
+// ---------------------------------------------------------------------------
+
+model Experience {
+  id          String   @id @default(cuid())
+  role        String
+  org         String
+  location    String?
+  startDate   String?
+  endDate     String?
+  current     Boolean  @default(false)
+  icon        String?
+  summary     String?
+  highlights  String? // JSON string[]
+  stack       String? // JSON skill ids
+  projects    String? // JSON project ids
+  visible     Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ---------------------------------------------------------------------------
+// Security, engineering, API documentation
+// ---------------------------------------------------------------------------
+
+model SecurityItem {
+  id        String   @id @default(cuid())
+  label     String
+  value     String?
+  icon      String?
+  level     String   @default("studied") // implemented | studied  (must stay honest)
+  summary   String?
+  detail    String?
+  projects  String? // JSON project slugs
+  visible   Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model EngineeringItem {
+  id        String   @id @default(cuid())
+  number    String?
+  title     String
+  icon      String?
+  what      String?
+  tech      String? // JSON string[]
+  why       String?
+  example   String? // JSON { project, note }
+  visible   Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ApiEndpoint {
+  id          String   @id @default(cuid())
+  method      String   @default("GET") // GET | POST | PUT | PATCH | DELETE
+  path        String
+  summary     String
+  description String?
+  auth        Boolean  @default(false)
+  query       String? // JSON [{ name, type, required, note }]
+  params      String? // JSON [{ name, type, required, note }]
+  body        String? // JSON field description or null
+  sampleBody  String? // JSON
+  sampleParams String? // JSON
+  statuses    String? // JSON [{ code, label, note }]
+  visible     Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ---------------------------------------------------------------------------
+// Communication
+// ---------------------------------------------------------------------------
+
+model Message {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String?
+  body      String
+  status    String   @default("unread") // unread | read | archived | spam
+  source    String   @default("contact") // contact | api
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// Settings & SEO
+// ---------------------------------------------------------------------------
+
+model Setting {
+  key       String   @id // site | seo | contact | appearance | features
+  value     String? // JSON
+  updatedAt DateTime @updatedAt
+}
+
+// ---------------------------------------------------------------------------
+// Analytics & integrations
+// ---------------------------------------------------------------------------
+
+model AnalyticsEvent {
+  id          String   @id @default(cuid())
+  type        String // visit | project_view | contact
+  projectSlug String?
+  path        String?
+  country     String?
+  device      String?
+  browser     String?
+  referrer    String?
+  visitorId   String? // salted hash of IP+UA, used only to approximate uniques
+  source      String   @default("live") // live | demo
+  createdAt   DateTime @default(now())
+
+  @@index([type])
+  @@index([createdAt])
+  @@index([source])
+}
+
+model GithubCache {
+  id        String   @id @default("default")
+  username  String?
+  data      String? // JSON { repos, commits, prs, stars, contributions }
+  status    String   @default("ok") // ok | degraded | error
+  message   String?
+  syncedAt  DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ---------------------------------------------------------------------------
+// Audit & notifications
+// ---------------------------------------------------------------------------
+
+model ActivityLog {
+  id          String   @id @default(cuid())
+  admin       Admin?   @relation(fields: [adminId], references: [id], onDelete: SetNull)
+  adminId     String?
+  action      String
+  entity      String? // project | skill | message | settings | ...
+  entityId    String?
+  entityTitle String?
+  meta        String? // JSON
+  ip          String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([entity])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  type      String
+  title     String
+  body      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([read])
+  @@index([createdAt])
+}

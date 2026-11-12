@@ -32,3 +32,6 @@ server/prisma/dev.db
 server/prisma/dev.db-journal
 server/*.db
 .env*
+
+# scratch build output from bundle analysis
+dist-analyze

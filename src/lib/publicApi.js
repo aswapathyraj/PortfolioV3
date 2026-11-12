@@ -36,6 +36,11 @@ async function get(path, { timeout = 4000 } = {}) {
 }
 
 export const publicApi = {
+  /**
+   * Everything the site needs in one call. The individual endpoints below stay
+   * available (and are used as a fallback) but the happy path is one request.
+   */
+  bootstrap: () => get('/bootstrap'),
   projects: () => get('/projects'),
   project: (slug) => get(`/projects/${encodeURIComponent(slug)}`),
   skills: () => get('/skills'),

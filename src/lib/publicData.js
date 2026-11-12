@@ -173,8 +173,32 @@ export function getRealProjects() {
  * Fetches every CMS-managed collection from the public API and merges it into
  * the live snapshots, preserving static metadata the API does not carry.
  * Never throws: on any failure it leaves the existing (static) data in place.
+ *
+ * The happy path is a single /bootstrap request. If that fails — older
+ * backend, partial outage — it falls back to the individual endpoints so a
+ * degraded API still updates what it can.
  */
 export async function hydratePublicData() {
+  let payload = null
+  try {
+    payload = await publicApi.bootstrap()
+  } catch {
+    payload = null
+  }
+
+  if (payload) {
+    return applyLiveData({
+      projects: payload.projects,
+      skills: payload.skills,
+      experience: payload.experience,
+      security: payload.security,
+      engineering: payload.engineering,
+      apiDocs: payload.apiDocs,
+      profile: payload.profile,
+      seo: payload.seo,
+    })
+  }
+
   let skills, projectsData, experienceData, securityData, engineeringData, apiData, profile, seo
   try {
     ;[skills, projectsData, experienceData, securityData, engineeringData, apiData, profile, seo] =
@@ -192,50 +216,75 @@ export async function hydratePublicData() {
     return false
   }
 
+  return applyLiveData({
+    projects: projectsData.status === 'fulfilled' ? projectsData.value : undefined,
+    skills: skills.status === 'fulfilled' ? skills.value : undefined,
+    experience: experienceData.status === 'fulfilled' ? experienceData.value : undefined,
+    security: securityData.status === 'fulfilled' ? securityData.value : undefined,
+    engineering: engineeringData.status === 'fulfilled' ? engineeringData.value : undefined,
+    apiDocs: apiData.status === 'fulfilled' ? apiData.value : undefined,
+    profile: profile.status === 'fulfilled' ? profile.value : undefined,
+    seo: seo.status === 'fulfilled' ? seo.value : undefined,
+  })
+}
+
+/** Merges a set of live collections into the snapshots. */
+function applyLiveData(live) {
+  const {
+    projects: projectsData,
+    skills: skillsData,
+    experience: experienceData,
+    security: securityData,
+    engineering: engineeringData,
+    apiDocs: apiDocsData,
+    profile: profileData,
+    seo: seoData,
+  } = live
+
   let changed = false
 
-  if (projectsData.status === 'fulfilled' && Array.isArray(projectsData.value)) {
-    projects = projectsData.value
+  if (Array.isArray(projectsData)) {
+    projects = projectsData
     changed = true
   }
 
-  if (skills.status === 'fulfilled' && Array.isArray(skills.value)) {
-    skillCategories = rebuildSkillCategories(skills.value)
+  if (Array.isArray(skillsData)) {
+    skillCategories = rebuildSkillCategories(skillsData)
     changed = true
   }
 
-  if (experienceData.status === 'fulfilled' && Array.isArray(experienceData.value)) {
-    experience = experienceData.value.map(normalizeExperience)
+  if (Array.isArray(experienceData)) {
+    experience = experienceData.map(normalizeExperience)
     changed = true
   }
 
-  if (securityData.status === 'fulfilled' && Array.isArray(securityData.value)) {
-    securityControls = securityData.value
+  if (Array.isArray(securityData)) {
+    securityControls = securityData
     changed = true
   }
 
-  if (engineeringData.status === 'fulfilled' && Array.isArray(engineeringData.value)) {
-    engineeringSteps = engineeringData.value
+  if (Array.isArray(engineeringData)) {
+    engineeringSteps = engineeringData
     changed = true
   }
 
-  if (apiData.status === 'fulfilled' && Array.isArray(apiData.value)) {
-    apiEndpoints = apiData.value
+  if (Array.isArray(apiDocsData)) {
+    apiEndpoints = apiDocsData
     changed = true
   }
 
-  if (profile.status === 'fulfilled' && profile.value) {
-    siteProfile = profile.value
+  if (profileData) {
+    siteProfile = profileData
     changed = true
   }
 
-  if (seo.status === 'fulfilled' && seo.value) {
-    siteSeo = seo.value
+  if (seoData) {
+    siteSeo = seoData
     changed = true
   }
 
   // Rebuild the derived skill→project cross-references now that both sides are live.
-  if (projectsData.status === 'fulfilled' && skills.status === 'fulfilled') {
+  if (Array.isArray(projectsData) && Array.isArray(skillsData)) {
     allSkills = rebuildAllSkills(skillCategories)
     changed = true
   }

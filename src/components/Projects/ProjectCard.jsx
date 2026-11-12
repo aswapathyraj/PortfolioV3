@@ -57,13 +57,17 @@ export function FeaturedProjectCard({ project, index }) {
       >
         {/* Visual */}
         <motion.div variants={fadeUp(18)} className="relative min-w-0 p-4 sm:p-6 lg:p-7">
+          {/* The diagram carries visible labels, so it must not sit inside the
+              link's accessible name. The link is a stretched overlay instead:
+              it keeps a meaningful name and the diagram stays plain text. */}
+          <div className="block overflow-hidden rounded-panel transition-transform duration-500 ease-out-quint group-hover:scale-[1.012]">
+            <ProjectVisual project={project} />
+          </div>
           <Link
             to={`/projects/${project.slug}`}
             aria-label={`Open the ${project.title} case study`}
-            className="block overflow-hidden rounded-panel transition-transform duration-500 ease-out-quint group-hover:scale-[1.012]"
-          >
-            <ProjectVisual project={project} />
-          </Link>
+            className="absolute inset-0"
+          />
         </motion.div>
 
         {/* Content */}
@@ -198,15 +202,18 @@ export function ProjectCard({ project }) {
           : 'border-line hover:-translate-y-0.5 hover:border-line-strong hover:shadow-lift',
       )}
     >
-      <Link
-        to={`/projects/${project.slug}`}
-        aria-label={`Open the ${project.title} case study`}
-        className="block p-3.5 pb-0"
-      >
+      {/* Stretched overlay link — the diagram's visible labels must not end up
+          inside the link's accessible name. */}
+      <div className="relative p-3.5 pb-0">
         <div className="overflow-hidden rounded-panel transition-transform duration-500 ease-out-quint group-hover:scale-[1.012]">
           <ProjectVisual project={project} aspect="aspect-[16/10]" />
         </div>
-      </Link>
+        <Link
+          to={`/projects/${project.slug}`}
+          aria-label={`Open the ${project.title} case study`}
+          className="absolute inset-0"
+        />
+      </div>
 
       <div className="flex flex-1 flex-col p-4">
         <div className="flex items-center gap-2">

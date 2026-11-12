@@ -28,13 +28,12 @@ const toneFor = (kind) => toneStyles[nodeKinds[kind]?.tone ?? 'neutral'] ?? tone
 function ArchitectureMiniature({ project }) {
   const rows = project.architecture?.rows ?? []
   const layerCount = rows.length
-  const ariaLabel = `${project.title} architecture: ${rows
-    .flat()
-    .map((node) => node.label)
-    .join(' → ')}`
 
   return (
-    <div className="relative flex h-full flex-col" role="img" aria-label={ariaLabel}>
+    // Decorative: the project title and summary sit right next to this diagram.
+    // Hiding it from the accessibility tree also keeps the wrapping link's
+    // accessible name free of the layer labels (label-in-name mismatch).
+    <div className="relative flex h-full flex-col" aria-hidden="true">
       {/* Schematic body */}
       <div className="flex min-h-0 flex-1 flex-col justify-center border-y border-line px-5 py-3 sm:px-6">
         <div className="relative">

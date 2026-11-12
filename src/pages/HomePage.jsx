@@ -1,26 +1,48 @@
-import { useEffect, useRef } from 'react'
+import { Suspense, lazy, useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 import { Seo } from '../components/ui/Seo.jsx'
 import { ErrorBoundary } from '../components/ui/ErrorBoundary.jsx'
 import { SectionDivider } from '../components/ui/Section.jsx'
 import { Hero } from '../components/Hero/Hero.jsx'
 import { Stats } from '../components/Stats/Stats.jsx'
-import { About } from '../components/About/About.jsx'
-import { Skills } from '../components/Skills/Skills.jsx'
-import { Projects } from '../components/Projects/Projects.jsx'
-import { Studio } from '../components/Studio/Studio.jsx'
-import { Engineering } from '../components/Engineering/Engineering.jsx'
-import { Architecture } from '../components/Architecture/Architecture.jsx'
-import { Database } from '../components/Database/Database.jsx'
-import { Security } from '../components/Security/Security.jsx'
-import { ApiExplorer } from '../components/ApiExplorer/ApiExplorer.jsx'
-import { Activity } from '../components/Activity/Activity.jsx'
-import { Experience } from '../components/Experience/Experience.jsx'
-import { Problems } from '../components/Problems/Problems.jsx'
-import { Resume } from '../components/Resume/Resume.jsx'
-import { Contact } from '../components/Contact/Contact.jsx'
 import { SkillFocusProvider } from '../hooks/useSkillFocus.jsx'
 import { scrollToSection } from '../utils/scroll.js'
+
+/**
+ * Only the hero and the stats strip are needed for the first paint, so every
+ * other section is a separate chunk. They mount together (the browser fetches
+ * them in parallel over HTTP/2) but they no longer sit in the entry bundle,
+ * which is what the first paint has to download and parse.
+ */
+const About = lazy(() => import('../components/About/About.jsx').then((m) => ({ default: m.About })))
+const Skills = lazy(() => import('../components/Skills/Skills.jsx').then((m) => ({ default: m.Skills })))
+const Projects = lazy(() => import('../components/Projects/Projects.jsx').then((m) => ({ default: m.Projects })))
+const Engineering = lazy(() =>
+  import('../components/Engineering/Engineering.jsx').then((m) => ({ default: m.Engineering })),
+)
+const Architecture = lazy(() =>
+  import('../components/Architecture/Architecture.jsx').then((m) => ({ default: m.Architecture })),
+)
+const Database = lazy(() => import('../components/Database/Database.jsx').then((m) => ({ default: m.Database })))
+const Security = lazy(() => import('../components/Security/Security.jsx').then((m) => ({ default: m.Security })))
+const ApiExplorer = lazy(() =>
+  import('../components/ApiExplorer/ApiExplorer.jsx').then((m) => ({ default: m.ApiExplorer })),
+)
+const Activity = lazy(() => import('../components/Activity/Activity.jsx').then((m) => ({ default: m.Activity })))
+const Experience = lazy(() =>
+  import('../components/Experience/Experience.jsx').then((m) => ({ default: m.Experience })),
+)
+const Problems = lazy(() => import('../components/Problems/Problems.jsx').then((m) => ({ default: m.Problems })))
+const Resume = lazy(() => import('../components/Resume/Resume.jsx').then((m) => ({ default: m.Resume })))
+const Contact = lazy(() => import('../components/Contact/Contact.jsx').then((m) => ({ default: m.Contact })))
+
+/**
+ * Placeholder that holds the space a section will occupy, so the page height
+ * does not jump when the chunk lands.
+ */
+function SectionSkeleton() {
+  return <div className="min-h-[60vh] w-full" aria-hidden="true" />
+}
 
 /**
  * Home page.
@@ -38,49 +60,20 @@ export function HomePage() {
   const landedRef = useRef(false)
 
   // Arriving from a case study at /#skills should land on that section.
-  // On an initial browser reload, skip the hash landing instead: App already
-  // scrolled to the top, and a refresh must start there even when the URL
-  // still carries #project-...
   useEffect(() => {
-    const isFirst = !landedRef.current
-    const instant = isFirst
+    const instant = !landedRef.current
     landedRef.current = true
     if (!location.hash) return
 
-    if (isFirst && performance.getEntriesByType('navigation')[0]?.type === 'reload') return
-
     const id = location.hash.slice(1)
-    const isCard = id.startsWith('project-')
 
-    // Project cards must sit just below the navbar when returning from a
-    // case study. Their own scroll-mt (112px) stacks on top of the global
-    // scroll-padding (96px), leaving 208px of "Selected Work" header above
-    // the card on mobile — so cards get an explicit top instead.
-    const land = (forceInstant) => {
-      const element = document.getElementById(id)
-      if (!element) return false
-      if (isCard) {
-        const top = element.getBoundingClientRect().top + window.scrollY - 96
-        window.scrollTo({ top: Math.max(0, top), behavior: forceInstant ? 'instant' : 'auto' })
-        return true
-      }
-      return scrollToSection(id, { updateHash: false, instant: forceInstant })
-    }
-
-    // One frame so the target section exists before we measure it.
+    // One frame so the target section exists before we measure it. Sections are
+    // lazy chunks, so the target may still be missing — poll until it lands
+    // instead of giving up on the first frame.
     const frame = requestAnimationFrame(() => {
-      // The home page mounts after the detail page's exit animation, so the
-      // card can be absent on the first frame. Poll briefly until it exists
-      // instead of giving up — otherwise mobile backs land at y=0.
       let attempts = 0
       const poll = () => {
-        if (land(instant)) {
-          // Land once more after layout settles: the skill-highlight banner
-          // and card entrance animations push the cards down after the first
-          // scroll, which left the section header in view instead of the card.
-          if (instant) setTimeout(() => land(true), 450)
-          return
-        }
+        if (scrollToSection(id, { updateHash: false, instant })) return
         attempts += 1
         if (attempts < 20) setTimeout(poll, 100)
       }
@@ -93,7 +86,6 @@ export function HomePage() {
     { key: 'about', node: <About /> },
     { key: 'skills', node: <Skills /> },
     { key: 'projects', node: <Projects /> },
-    { key: 'studio', node: <Studio /> },
     { key: 'engineering', node: <Engineering /> },
     { key: 'architecture', node: <Architecture /> },
     { key: 'database', node: <Database /> },
@@ -118,17 +110,23 @@ export function HomePage() {
 
       {sections.map(({ key, node }, index) => (
         <div key={key}>
-          <ErrorBoundary label={key}>{node}</ErrorBoundary>
+          <ErrorBoundary label={key}>
+            <Suspense fallback={<SectionSkeleton />}>{node}</Suspense>
+          </ErrorBoundary>
           {index < sections.length - 1 ? <SectionDivider /> : null}
         </div>
       ))}
 
       <ErrorBoundary label="resume" silent>
-        <Resume />
+        <Suspense fallback={<SectionSkeleton />}>
+          <Resume />
+        </Suspense>
       </ErrorBoundary>
 
       <ErrorBoundary label="contact">
-        <Contact />
+        <Suspense fallback={<SectionSkeleton />}>
+          <Contact />
+        </Suspense>
       </ErrorBoundary>
     </SkillFocusProvider>
   )

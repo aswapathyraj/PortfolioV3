@@ -91,6 +91,16 @@ export function Footer() {
           <div className="min-w-0">
             <p className="mono-label mb-4">Elsewhere</p>
             <SocialTextLinks />
+            <a
+              href="https://pixelsyncstudio.vercel.app/"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="mt-4 inline-flex items-center gap-1.5 text-sm text-muted transition-colors duration-200 hover:text-fg"
+            >
+              <span className="font-semibold text-fg">PixelSync Studio</span>
+              <span className="text-subtle"> · Co-founder</span>
+              <Icon name="arrowUpRight" className="size-3" />
+            </a>
 
             {isConfigured(site.location) ? (
               <p className="mono-label mt-5 flex items-center gap-1.5">

@@ -8,15 +8,15 @@
  */
 import { execSync } from 'node:child_process'
 
-const run = (cmd) => execSync(cmd, { stdio: 'inherit' })
+const run = (cmd, cwd) => execSync(cmd, { stdio: 'inherit', cwd })
 
 const isDeploy = Boolean(process.env.VERCEL) || process.env.VERCEL_ENV === 'production' || process.env.VERCEL_ENV === 'preview'
-const schema = isDeploy ? 'server/prisma/schema.postgresql.prisma' : 'server/prisma/schema.prisma'
+const schema = isDeploy ? 'prisma/schema.postgresql.prisma' : 'prisma/schema.prisma'
 const label = isDeploy ? 'production (postgresql)' : 'local (sqlite)'
 
 console.log(`[vercel-build] generating Prisma client for ${label}`)
-run('npm --prefix server install')
-run(`npx prisma generate --schema ${schema}`)
+run('npm install', 'server')
+run(`npx --no-install prisma generate --schema ${schema}`, 'server')
 
 console.log('[vercel-build] building the SPA')
-run('npm run build')
+run('npm run build', '.')
